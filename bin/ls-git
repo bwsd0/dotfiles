@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# recursively search for git repositories under the given directory and report
+# disk space usage
+find "${1:-.}" -type d -name .git -print |
+    sed -e s,/.git$,, |
+    xargs -r \
+    du -sh |
+    sort -k2

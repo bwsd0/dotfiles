@@ -1,0 +1,335 @@
+runtime system.vim
+
+set nocompatible
+
+if has('autocmd')
+  let g:maplocalleader = ','
+  filetype plugin indent on
+endif
+
+if !exists('$LANG')
+  set encoding=utf-8
+endif
+scriptencoding utf-8
+
+if has('multi_byte')
+  set encoding=utf-8
+endif
+
+if isdirectory(expand("$HOME/.vim"))
+  let $VIMDIR=expand("$HOME/.vim")
+  execute 'set runtimepath^='. "$VIMDIR"
+elseif &runtimepath !=# ''
+  let $VIMDIR = split#Option(&runtimepath)[0]
+endif
+
+set t_Co=256
+set background=dark
+syntax on
+colorscheme hybrid
+
+" disable modelines due to arbitrary code execution vulnerabilities
+" (CVE-2019-12735)
+set modelines=0
+set nomodeline
+
+" appearance
+set wildmenu
+
+" Script-generated patterns to exclude when offering completions
+set wildignore=*~,*.7z,.DS_Store,.git,.hg,.svn,*.a,*.avi,*.bin,*.bmp,*.bz2
+      \,*.class,*.db,*.dbm,*.djvu,*.dll,*.docx,*.exe,*.flac,*.gif,*.gpg
+      \,*.gz,*.ico,*.iso,*.jar,*.jpeg,*.jpg,*.m4a,*.o,*.ogg,*.ogv,*.opus
+      \,*.orig,*.pdf,*.png,*.ppt,*.pyc,*.rar,*.rm,*.sqlite,*.so,*.swf
+      \,*.swp,*.tar,*.tga,*.ttf,*.wav,*.webm,*.xls,*.xlsx,*.xz,*.zip
+
+set wildignore+=*node_modules/**
+
+if exists('+cursorline')
+  if exists('g:colors_name')
+    set cursorline
+  endif
+endif
+
+set number
+
+set colorcolumn=80
+
+set lines=50
+
+set columns=79
+
+" command history to keep
+set history=10000
+
+" number of screen lines to use for the command-line
+set cmdheight=1
+
+" show (partial) command in the last line of the screen
+set noshowcmd
+
+" hide startup message when opening Vim without a filename
+set shortmess+=I
+
+set laststatus=2
+
+set linespace=2
+
+" show lines of context around the cursor
+set scrolloff=5
+
+" show matching braces
+set showmatch
+
+set title
+
+" indicate fast terminal connection for smoother redrawing
+set ttyfast
+
+" disable visual bell
+set visualbell t_vb=
+
+" behaviour
+
+" timeout after 1000ms between key events
+set timeout
+set timeoutlen=1000
+
+" chdir to the buffer in use
+set autochdir
+
+set mouse=
+
+set linebreak
+" save on buffer switch
+set autowrite
+
+set spelllang=en_us
+set dictionary^=/usr/share/dict/words
+nnoremap <leader>s
+      \ :set spell!<CR>
+
+" line break when char >80
+set textwidth=80
+
+" copy and paste
+vmap <C-c> "+yi
+vmap <C-x> "+c
+vmap <C-v> c<ESC>"+p
+imap <C-v> <ESC>"+pa
+
+set complete=.,w,b,u,t
+
+set completeopt=longest,menuone
+
+set backspace=indent,eol,start
+
+set formatoptions+=l
+
+set listchars=eol:$,tab:>-,trail:-,nbsp:+
+
+if has('unix')
+  set backup
+  if !has('patch-8.1.1519')
+    set backupskip&
+  endif
+  let s:backupdir=$HOME.'/.vim/backup/'
+  set backupskip^=/dev/shm/*,/usr/tmp/*,/var/tmp/*,/tmp/*,$TMPDIR/*,$TMP/*,$TEMP/*
+  if !isdirectory(s:backupdir)
+    call mkdir(s:backupdir, 'p', 0700)
+  endif
+  execute 'set backupdir^='.s:backupdir
+endif
+
+" disable swap files
+set noswapfile
+" folding
+set foldignore=
+" re-indent from previous line
+set autoindent
+" uses spaces instead of tabs
+set expandtab
+" indent using four spaces when using indent operation
+set shiftwidth=4
+" indent intelligently but use 'tabstop' everywhere else
+set smarttab
+" spaces to show for a literal tab when 'list' is unset
+set tabstop=4
+
+function! GitBranch()
+  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
+endfunction
+
+function! StatuslineGit()
+  let l:branchname = GitBranch()
+  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
+endfunction
+
+set statusline+=%#PmenuSel#
+" Display branch name if the working directory is in a git repository
+set statusline+=%{StatuslineGit()}
+set statusline+=%#LineNr#
+" Display fullpath to file in the buffer
+set statusline+=\ %F
+" Denote modified, unsaved buffer with a plus (+) sign
+set statusline+=%m
+" Right-align statusline components below
+set statusline+=%=
+set statusline+=%#CursorColumn#
+" Filetype
+set statusline+=\ %y
+" File encoding
+" set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+" File format
+" set statusline+=\[%{&fileformat}\]
+" Show current position in buffer (percent)
+set statusline+=\ %p%%
+" line_nr:col_nr
+set statusline+=\ %l:%c
+
+" Apply 'softtabstop' on tab-press in insert mode using the same number of
+" spaces as 'shiftwidth'
+execute 'set softtabstop='
+            \ . &shiftwidth
+
+au BufNewFile,BufRead *.txt setlocal noet ts=4 sw=4
+au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet ts=4 sw=4
+au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=2 sw=2
+au BufNewFile,BufRead *.json setlocal expandtab ts=2 sw=2
+au BufNewFile,BufRead *.go set filetype=go
+au BufNewFile,BufRead *.msmtprc set filetype=msmtp
+
+autocmd FileType msmtp setlocal syntax=msmtp
+autocmd FileType fstab,systemd set noexpandtab
+autocmd FileType sh set noexpandtab
+autocmd FileType gitcommit setlocal spell
+autocmd FileType APKBUILD setlocal filetype=sh
+autocmd FileType go setlocal syntax=go
+
+" c
+autocmd FileType c setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
+
+" terraform
+autocmd Filetype tf setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
+
+" javascript
+autocmd Filetype js setlocal expandtab shiftwidth=2 tabstop=2
+
+" search
+
+" search result highlighting
+set hlsearch
+
+" case-insensitive search
+set ignorecase
+set smartcase
+
+" search incrementally
+set incsearch
+
+" don't redraw screen during execution of macros and scripts
+set lazyredraw
+
+" ms delay before showing match
+set mat=2
+
+" Maximum number of columns per line that syntax highlighting will match
+set synmaxcol=120
+
+" paths where tags may be located
+set tags=./tags.tags;$HOME
+
+" mappings
+let mapleader = ","
+
+" faster way to exit insert mode
+inoremap jj <Esc>
+
+nnoremap ; :
+nnoremap : ;
+vnoremap ; :
+vnoremap : ;
+
+nnoremap <silent> <Space> :nohlsearch<CR>
+
+" Toggle spell checking
+nnoremap <Leader>s
+      \ :<C-U>set spell! spell?<CR>
+
+" window navigation
+nnoremap <C-H> <C-W>h
+nnoremap <C-J> <C-W>j
+nnoremap <C-K> <C-W>k
+nnoremap <C-L> <C-W>l
+
+" yank from cursor to end of line instead of before and after cursor
+" nnoremap Y y$
+
+" disable arrow keys when in normal/visual mode
+noremap <Up> <nop>
+noremap <Down> <nop>
+noremap <Left> <nop>
+noremap <Right> <nop>
+
+" switch to the current buffer's alternative buffer
+nnoremap <Backspace> <C-^>
+
+" write to buffer as superuser
+cmap w!! w !sudo tee > /dev/null %
+
+" Strip trailing whitespace
+nnoremap <Leader>ws
+      \:%s/\s\+$//<cr>:let @/=''<CR>
+
+"" Leader,l toggles showing tab, end-of-line, and trailing white space
+noremap <Leader>l
+      \ :<C-U>set list! list?<CR>
+
+" undo peristence
+if has('persistent_undo')
+  let undodir = expand($VIMDIR.'/cache/undo')
+
+  " backup all undo history files to $VIMDIR/undo
+  if !isdirectory(undodir)
+    call mkdir(undodir, "p")
+  endif
+
+  set undodir=~/.vim/cache/undo
+  set undofile
+  let s:undos = split(globpath(&undodir, '*'), "\n")
+  " delete undo history files after 30 days
+  " TODO: make this a crontab(5) task
+  call filter(s:undos, 'getftime(v:val) < localtime() - (60 * 60 * 24 * 30)')
+  call map(s:undos, 'delete(v:val)')
+endif
+
+if has('autocmd')
+  filetype plugin indent on
+  augroup vimrcEx
+    au!
+    autocmd FileType text setlocal textwidth=79
+
+    " When editing a file, always jump to the last known cursor position,
+    " except when:
+    " - the cursor position be invalid or inside an event handler
+    " - mark is the first line
+    autocmd BufReadPost *
+          \ if line("'\"") > 1 && line("'\"") <= line("$") |
+          \	exe "normal! g`\"" |
+          \ endif
+  augroup END
+  augroup templates
+    autocmd BufNewFile *.[sh|bash] 0r ~/.vim/templates/shell.sh
+    autocmd BufNewFile [README]*.[md|markdown] 0r ~/.vim/templates/README.md
+    autocmd BufNewFile main.c 0r ~/.vim/templates/main.c
+    autocmd BufNewFile *.html 0r ~/.vim/templates/index.html
+  augroup END
+endif
+
+" use vim session as manpager
+runtime! ftplugin/man.vim
+
+nnoremap <Leader>1 :Lexplore<CR>
+let g:netrw_banner = 0
+
+ab url URL

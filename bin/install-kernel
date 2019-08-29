@@ -1,0 +1,64 @@
+#!/bin/sh
+set -e
+set -o pipefail
+
+KERNELVERSION=${KERNELVERSION:-}
+
+install_kernel() {
+    if [ $# -ne 4 ]; then
+        echo "Usage: install-kernel <version> <image> <System.map> <directory>"
+        exit 1
+    else
+        KERNELVERSION="$1"
+        bootimage="$2"
+        sysmap="$3"
+        DESTDIR="$4"
+    fi
+
+    suffix=
+    flavor=${kernelversion##*[0-9]-}
+    if [ "$flavor" != "$kernelversion" ]; then
+        suffix=-$flavor
+    fi
+
+    for i in vmlinuz${suffix} System.map${suffix} config${suffix}; do
+        if [ -e "$DESTDIR"/$i ]; then
+            cp "$DESTDIR"/$i "$DESTDIR"/$i.old
+        fi
+    done
+
+    config=$(dirname "$sysmap")/.config
+
+    cp "$bootimage" "$DESTDIR"/vmlinuz${suffix}
+    cp "$sysmap" "$DESTDIR"/System.map${suffix}
+    cp "$config" "$DESTDIR"/config${suffix}
+}
+
+#https://git.kernel.org/$KERNEL_VERSION
+
+kernel_version() {
+	ver="$1"
+	if [[ -z "$ver" ]]; then
+		# default to the latest stable version
+		ver=$(curl -sSL https://www.kernel.org/finger_banner \
+			| grep 'latest stable version' \
+			| awk -F: '{gsub(/ /,"", $0); print $2}')
+	fi
+	if [ -z "$ver" ]; then
+		error 1 "failed to probe latest kernel version"
+	fi
+    printf "%s\n" "$ver"
+}
+
+usage() {
+	cat <<-EOF
+	$(basename "$0") [COMMAND] [ARG...]
+	check-version
+		returns the latest stable kernel version
+	fetch [stable] [mainline] [next]
+		download latest {stable,mainline,next} Linux kernel tarball from
+		kernel.org
+	install-kernel
+		install a bootable kernel image
+	EOF
+}

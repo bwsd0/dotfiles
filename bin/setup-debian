@@ -1,0 +1,434 @@
+#!/bin/bash
+# ACHTUNG! This code is hacky, untested and may break your system; DO NOT USE!
+# Can you read this? achtung? How? Tell me! Or I will break your bones.
+set -e
+set -o pipefail
+
+export SYSROOT=${SYSROOT:-/mnt/debinst}
+export ARCH=
+export REL=buster
+export DEBIAN_FRONTEND=noninteractive
+
+# A faster Debian mirror can be found using netselect(1) or netselect-apt(1)
+# Mirror list: http://www.debian.org/mirror/list
+export MIRROR=${MIRROR:-https://deb.debian.org/debian/}
+
+USE_BACKPORTS=${USE_BACKPORTS:-1}
+
+user_perms() {
+	local user=$1
+
+	if [[ -z "$user" ]]; then
+		error 1 "no user"
+	fi
+
+	# add user to sudoers
+	adduser "$user" sudo
+
+	gpasswd -a "$user" systemd-journal
+	gpasswd -a "$user" systemd-network
+
+	# create docker group
+	groupadd docker
+	gpasswd -a "$user" docker
+
+	{ \
+		printf "%s ALL=(ALL) NOPASSWD:ALL\\n" "$user"; \
+		printf "%s ALL=NOPASSWD: /sbin/ifconfig, /sbin/ifup, /sbin/ifdown, /sbin/ifquery\\n" "$user"; \
+	} >> sudoers
+}
+
+setup_aptconf() {
+	mkdir -p "$SYSROOT"/etc/apt/apt.conf.d
+
+	cat >"$SYSROOT"/etc/apt/apt.conf.d/99translations <<-EOF
+    # Disable translations for unneeded localizations to reduce download times
+    # and disk space use.
+	Acquire::Languages "none";
+	EOF
+
+    cat >"$SYSROOT"/etc/apt/apt.conf.d/01norecommend <<-EOF
+    # Disable recommened packages as a dependency for installing.
+	APT::Install-Recommends "0";
+	APT::Install-Suggests "0";
+	EOF
+
+    exit 0
+
+	#cat >"$SYSROOT"/etc/apt/apt.conf.d/50unattended-upgrades <<-EOF
+    #Unattended-Upgrade::Automatic-Reboot "true";
+    #Unattended-Upgrade::Automatic-Reboot-Time "07:00";
+    #EOF
+
+    #apt install unattended-upgrades apt-listchanges
+    #cat >"$SYSROOT"/etc/apt/apt.conf.d/02periodic <<-EOF
+    #APT::Periodic::Enable "1";
+    #EOF
+}
+
+# search the official repositories when an unrecognized command is entered
+setup_command_not_found() {
+    apt install command-not-found apt-file
+    apt-file update && update-command-not-found
+}
+
+setup_mlocate() {
+    apt install mlocate && /etc/cron.daily/mlocate
+}
+
+setup_etc() {
+	mkdir -p "$SYSROOT"/etc
+
+    cp /etc/hosts "$SYSROOT"/etc/hosts
+	cp /etc/hostname "$SYSROOT"
+    cp /etc/resolv.conf "$SYSROOT"/etc/resolv.conf
+
+    #cat > "$SYSROOT"/etc/resolv.conf <<-EOF
+    #nameserver 8.8.8.8
+    #nameserver 8.8.4.4
+    #EOF
+
+    #echo 'kernel.dmesg_restrict = 0' >> /etc/sysctl.conf
+    #sysctl -p
+}
+
+setup_apt_sources() {
+	local comps="main contrib non-free"
+
+	cat > "$SYSROOT"/etc/apt/sources <<-EOF
+	# Base repository
+	deb "$MIRROR" buster "$comps"
+	deb-src "$MIRROR" buster "$comps"
+
+	# Security updates
+	deb http://security.debian.org/debian-security buster/updates "$comps"
+	deb-src http://security.debian.org/debian-security buster/updates "$comps"
+
+	# Stable updates
+	deb "$MIRROR" buster-updates "$comps"
+	deb-src "$MIRROR" buster-updates "$comps"
+	EOF
+
+    if ! [ -n "$USE_BACKPORTS" ]; then
+        return 0
+    fi
+
+    cat > "$SYSROOT"/etc/apt/sources <<-EOF
+	# Stable backports
+	deb "$MIRROR" buster-backports "$comps"
+	deb-src "$MIRROR" buster-backports "$comps"
+	EOF
+}
+
+init_chroot_mounts() {
+    mount --bind /dev/ ${SYSROOT}/dev
+    mount --bind /dev/ ${SYSROOT}/dev/pts
+    mount --bind /proc ${SYSROOT}/proc
+}
+
+unmount_chroot_mounts() {
+    [ ! -z "$SYSROOT" ] && umount "$SYSROOT"/proc
+    [ ! -z "$SYSROOT" ] && umount "$SYSROOT"/dev/pts
+    [ ! -z "$SYSROOT" ] && umount "$SYSROOT"/dev
+}
+
+# setup a Debian chroot
+setup_chroot() {
+    if [ -d $SYSROOT ]; then
+        echo "$SYSROOT already exists" && exit 0
+    else
+        mkdir -p $SYSROOT
+    fi
+
+    if [ ! -n "$ARCH" ]; then
+	    ARCH=$(dpkg --print-architecture)
+    fi
+
+    #apt-get install binutils debootstrap
+	debootstrap --verbose --variant=buildd \
+        --arch="$ARCH" "$REL" "$SYSROOT" "$MIRROR"
+
+    # prohibit dpkg from starting daemons in the chroot
+	cat > "$SYSROOT"/usr/sbin/policy-rc.d <<-EOF
+	#!/bin/sh
+	exit 101
+	EOF
+
+    chmod a+x "$SYSROOT"/usr/sbin/policy.rc.d
+
+	setup_aptconf
+	# replicate the hosts package selections to the chroot
+	dpkg --get-selections > "$SYSROOT"/var/lib/dpkg/pkg-list
+    sed -i '/deinstall/d' "$SYSROOT"/var/lib/dpkg/pkg-list
+
+    # target host:
+    apt-cache dumpavail | dpkg --merge-avail
+	dpkg --clear-selections
+	dpkg --set-selections < "$SYSROOT"/var/lib/dpkg/"$pkglist"
+	apt-get dselect-upgrade
+
+    setup_etc
+
+	# enter the chroot environment
+	LANG=C.UTF-8 chroot "$SYSROOT" /bin/bash
+    export PS1="(chroot) $PS1"
+}
+
+netinst() {
+    local dest
+    dest="$1"
+
+    if [ -z $dest ]; then
+        error 1 "missing argument"
+    fi
+    wget -c "https://cdimage.debian.org/amd64-netinst.iso"
+    wget "https://cdimage.debian.org/amd64/iso-cd/SHA256SUMS"
+    sha256sum -c SHA256SUMS
+
+    dd bs=4M if=${NETINST}.iso of="$dest" status=progress oflag=sync
+}
+
+postinst() {
+    apt update && apt full-upgrade
+    dpkg-reconfigure keyboard-configuration
+    dpkg-reconfigure console-setup
+}
+
+install_base() {
+    apt-install -y \
+        apt-https-transport \
+        ca-certificates \
+        gpgv2 \
+        git \
+        curl \
+        ssh \
+        netutils \
+        unzip \
+        build-essential \
+        make \
+        jq \
+        zip \
+        xz-utils \
+        automake \
+        m4 \
+        dns-utils \
+        file \
+        bzip2 \
+        findutils \
+        tree \
+        gcc \
+        pinentry-tty
+}
+
+base_min() {
+	apt update || true
+	apt -y upgrade
+
+	apt-install -y \
+        alsa-utils \
+		apparmor \
+		fwupd \
+		fwupdate \
+		systemd \
+		gnupg-agent \
+		tmux \
+		rxvt-unicode-256color \
+		xclip \
+        feh \
+        scrot \
+        slock
+
+	apt autoremove
+	apt autoclean
+	apt clean
+}
+
+install_basesystem() {
+	base_min
+
+	apt install -y \
+		adduser \
+		automake \
+		bash-completion \
+		bzip2 \
+		ca-certificates \
+		coreutils \
+		curl \
+		dnsutils \
+		file \
+		findutils \
+		gcc \
+		git \
+		gnupg \
+		gnupg2 \
+		grep \
+		gzip \
+		hostname \
+		indent \
+		iptables \
+		jq \
+		less \
+		libc6-dev \
+		locales \
+		lsof \
+		make \
+		mount \
+		net-tools \
+		ssh \
+		strace \
+		sudo \
+		tar \
+		tree \
+		tzdata \
+		unzip \
+		vim \
+		xz-utils \
+		zip
+
+	apt autoremove
+	apt autoclean
+	apt clean
+}
+
+# Check kernel configuration compatibility with script in moby repo if
+# install is not successful: /usr/share/docker/contrib/check-config.sh
+install_docker() {
+	apt-update || true
+	apt -y upgrade
+
+	apt install -y \
+		apt-transport-https \
+		ca-certificates \
+		curl \
+		gnupg2 \
+		software-properties-common
+
+    host="https://download.docker.com/linux/debian"
+    version="5:19.03.0~3-0~debian-buster"
+
+    curl -fsSL "$host"/gpg | apt-key add -
+	add-apt-repository "deb [arch=amd64] $host \
+        $(lsb_release -cs) \
+        stable edge"
+
+    apt-get update
+	apt install -y docker-ce="$version" \
+        docker-ce-cli="$version" \
+        containerd.io
+
+    docker run hello-world
+
+	apt autoclean
+	apt clean
+}
+
+install_op() {
+	if [ -x "$(command -v op)" ]; then
+		printf "op is already installed"; exit 0
+	fi
+
+	local host="https://cache.agilebits.com/dist/1P/op/pkg"
+	local ver="v0.5.7"
+	local tmpdir=$(mktemp -d)
+	OP_RELEASE="${host}/${ver}op_linux_amd64_${ver}.zip"
+
+	curl -sS "$OP_RELEASE" -o "$tmpdir"/op.zip
+	unzip "$tmpdir/op.zip"
+
+    # TODO: GPG key-ids are forgeable
+	gpg --recv-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
+	gpg --verify op.sig op
+
+	mv op /usr/local/bin
+	rm op.sig
+}
+
+install_signal() {
+	if [ -x "$(command -v signal-desktop)" ]; then
+		printf "signal-desktop is already installed\\n"; exit 0
+	fi
+
+    local host="https://updates.signal.org"
+	curl -fsSL "$host/desktop/apt/keys.asc" | apt-key add -
+    echo "deb [arch=amd64] $host/desktop/apt xenial main" \
+        | tee -a /etc/apt/sources.list.d/signal-xenial.list
+
+	apt update || true
+	apt install -y signal-desktop
+}
+
+fail_unless_root() {
+    if [ "$(id -u)" = "0" ]; then
+		error 1 "$1 must be run as root"
+	fi
+}
+
+error() {
+	local error="$1"
+	local fmt="$2"
+	shift; shift;
+	# shellcheck disable=SC2059
+	(printf "error: $fmt\\n" "$@" ) >&2
+	exit "$error"
+}
+
+usage() {
+	cat <<-EOF
+	Usage: $(basename "$0") [COMMAND] [ARG...]
+
+	Setup a Debian system
+	apt
+	    setup apt
+	install [docker] [op] [signal]
+	    install packages
+	users
+	    setup Debian user group
+	help
+	    print this help
+	options:
+	  -h Show this help
+	EOF
+}
+
+if [ -z "$1" ]; then
+	usage; exit 1
+fi
+
+cmd=$1
+while (($# > 0)); do
+	case $cmd in
+        users)
+            shift
+            user_perms "$1"
+			;;
+        apt)
+            setup_aptconf
+            exit 0
+            ;;
+		base)
+			install_basesystem
+			exit 0
+			;;
+		install)
+			shift
+			inst="$@"
+			for i in "$@"
+			do
+				case "$i" in
+					docker) install_docker ;;
+					signal) install_signal ;;
+					op) install_op ;;
+					*) echo "huh? $i" >&2 ;;
+				esac
+			done
+			;;
+		help|-h)
+			usage
+			exit 0
+			;;
+		*)
+			usage
+			error 1 "%s is not a valid command" "$cmd"
+			;;
+	esac
+done

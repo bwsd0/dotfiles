@@ -1,0 +1,46 @@
+set bell-style none
+
+set input-meta on
+set output-meta on
+
+set completion-query-items 2048
+
+set bind-tty-special-chars off
+
+# supress output of control characters
+set echo-control-characters off
+
+set show-all-if-ambiguous on
+
+set editing-mode vi
+$if mode=vi
+    set keymap vi-command
+    Control-l: clear-screen
+    set keymap vi-insert
+    Control-l: clear-screen
+$endif
+
+set skip-completed-text on
+
+# enable case-insensitive tab completion
+set completion-ignore-case on
+
+# expand tilde (~) to fullpath
+set expand-tilde on
+
+# disable pagination of possible completions
+set page-completions off
+
+set print-completions-horizontally on
+
+set mark-directories on
+
+set mark-symlinked-directories on
+
+# disable completions for match hidden files unless pattern begins with a dot
+set match-hidden-files off
+
+$if Bash
+    Tab: complete
+    Space: magic-space
+$endif

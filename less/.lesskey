@@ -1,0 +1,9 @@
+#env
+# -d: supress error messages displayed if terminal is "dumb"
+# -i: make search caase insensitive for lower-case terms
+# -Q: never wring terminal bell
+# -R: only output ANSI color escape sequences
+# -X: disable termcap deinitinialization string to prevent clearing screen
+# -F: exit immediately if the file can be displayed on the first screen
+LESS = diQRXF
+LESSHISTFILE = -

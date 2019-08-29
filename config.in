@@ -1,0 +1,17 @@
+NAME = 'Barry Wasdell'
+USER = bwasd
+EMAIL = "barrywasdell@gmail.com"
+KEY = 1444995EA28E4606A75BD7327BC21207AB08D788
+
+# GPG
+GNUPGHOME := .gnupg
+KEYSERVER = pgp.mit.edu
+
+# msmtp and mbsync
+PASSCMD = "op get item 'Google Mail App Password - PC' | jq -r -M '.details.password'"
+#PASSCMD gpg --no-tty -q -d ~/gmail-app-token.com.gpg
+#PASSCMD pass show email/tokens/gmail.com
+
+# Mutt
+SENDMAIL = /usr/bin/msmtp
+MAILDIR = ~/Mail

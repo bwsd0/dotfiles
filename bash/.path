@@ -1,0 +1,16 @@
+#!/bin/sh
+# manage the contents of PATH variable within the current shell
+
+export GOPATH=${HOME}/go
+export PATH=/usr/local/bin:${PATH}:/sbin
+
+# go path
+export PATH=/usr/local/go/bin:${GOPATH}/bin:${PATH}
+
+# rust path
+export PATH=${HOME}/.cargo/bin:${PATH}
+
+export PATH=${HOME}/.local/bin:${PATH}
+
+# cdpath
+export CDPATH=${CDPATH}:${GOPATH}/src/github.com:${GOPATH}/src/golang.org:${GOPATH}/src

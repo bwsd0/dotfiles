@@ -1,0 +1,68 @@
+#!/bin/sh
+#
+#
+set -eu
+
+# default maximum file size limit (256 kiB)
+FILE_SIZE_LIMIT=$((1 << 18))
+
+error() {
+	fmt="$1"
+	shift;
+	# shellcheck disable=SC2059
+	(printf "\\033[0;31mpre-commit: \\033[0m$fmt" "$@" ) >&2
+}
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	SHA=HEAD
+else
+	SHA=$(git hash-object -t tree /dev/null)
+fi
+
+exec 1>&2
+
+modified_files() {
+	git diff-index \
+		--name-only \
+		--cached \
+		--diff-filter=ACMR HEAD \
+		-- "$@"
+}
+
+# warn if non-ASCII filenames are in the staging area
+check_filenames() {
+	if test $(git diff --cached --name-only --diff-filter=A -z "$SHA" | \
+		LC_ALL=C tr -d '[ -~]\0' | wc -c) != 0
+	then
+		error "warning: staged area contains non-ASCII filenames\\n"
+		exit 1
+	fi
+}
+
+# warn about excessively large files. For example
+#
+#	head -c 1MB </dev/urandom >bigfoo
+#	git add bigfoo
+#	git commit bigfoo
+#
+# aborts the commit with the following error:
+# pre-commit: warning: templates/bigfoo is 976 kiB (binary or generated?)
+check_filesize() {
+	path="$1"
+	size=$(git cat-file -s ":$path")
+
+	if [ "$size" -gt "$FILE_SIZE_LIMIT" ]; then
+		size_kb=$(( size / 1024 ))
+		error "warning: %s is %d kiB (binary or generated?)\\n" "$path" "$size_kb"
+		exit 1
+	fi
+}
+
+check_filenames
+for file in $(modified_files); do
+	check_filesize "$file"
+done
+
+# abort the commit if there are whitespace errors in staged files
+exec git diff-index --check --cached "$SHA" --

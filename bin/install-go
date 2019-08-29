@@ -1,0 +1,132 @@
+#!/bin/bash
+#
+# go-install downloads and installs the latest Go binary release for linux
+# systems.
+set -e
+
+ARCH=${ARCH-amd64}
+MIRROR="https://storage.googleapis.com/golang/"
+
+# alternate official mirror
+#MIRROR="https://golang.org/dl/"
+
+# list of release candidates and/or specific versions of Go be installed
+EXTRA_VERSIONS=( go1.13rc1 )
+
+version() {
+	ver=$(curl --retry 3 -sSL "https://golang.org/VERSION?m=text")
+    if [ -z "$ver" ]; then
+        echo "failed to query latest golang version" || exit 1
+    fi
+
+    printf "%s" "$ver"
+}
+
+install_sources() {
+    GO_VERSION=$(version)
+    export GO_VERSION
+
+    GO_SRC=/usr/local/go
+    export GO_SRC
+
+    if [ -x "$(command -v go)" ]; then
+        ver=$(go tool dist version \
+            | grep -E '^(go[0-9]+\.[0-9]+)([\.]?[0-9]*)($|rc|beta|\.)')
+
+        if [ "$GO_VERSION" == "$ver" ]; then
+            echo "go distribution up to date: $GO_VERSION" && exit 0
+        fi
+    fi
+
+	if [ -d "$GO_SRC" ]; then
+		sudo rm -rf "$GO_SRC"
+	fi
+    if [ -d "$GOPATH" ]; then
+	    sudo rm -rf "$GOPATH"
+    fi
+
+	(
+	KERNEL=$(uname -s | tr '[:upper:]' '[:lower:]')
+    GO_RELEASE="${MIRROR}${GO_VERSION}.${KERNEL}-${ARCH}.tar.gz"
+    GO_SHA256=$(curl -sSL "${GO_RELEASE}.sha256")
+    GO_GPGSIG=$(curl -sSL "${GO_RELEASE}.asc")
+    echo "$GO_GPGSIG"
+
+	curl -sSL "$GO_RELEASE" -o golang.tar.gz \
+        && echo "$GO_SHA256" golang.tar.gz | sha256sum -c - \
+        && sudo tar -C /usr/local -xzf golang.tar.gz \
+        && rm golang.tar.gz
+
+	# rebuild standard library
+	sudo chown -R "${USER}" /usr/local/go/pkg
+	CGO_ENABLED=0 go install -a -installsuffix cgo std
+	)
+
+    for v in "${EXTRA_VERSIONS[@]}"; do
+        go get golang.org/dl/"${v}"
+        "$v" download
+    done
+}
+
+go_postinst() {
+	(
+	set -x
+	set +e
+
+    for tool in golang.org/x/tools/cmd/{cover,goimports,gorename}; do
+        go get "$tool"
+    done
+
+    go get golang.org/x/lint/golint
+    go get golang.org/x/net
+
+	projects=( bwasd/poop bwasd/plumb )
+	for proj in "${projects[@]}"; do
+		owner=$(dirname "$proj")
+		repo=$(basename "$proj")
+
+		if [ -d "${HOME}/${repo}" ]; then
+			rm -rf "${HOME:?}/${repo}"
+		fi
+
+		mkdir -p "${GOPATH}/src/github.com/${owner}"
+
+		if [ ! -d "${GOPATH}/src/github.com/${proj}" ]; then
+            git -C "${GOPATH}/src/github.com/${owner}" \
+                clone "git@github.com:${proj}.git"
+		fi
+	done
+    )
+}
+
+usage() {
+	cat <<-EOF
+	Usage: $(basename "$0") [-c|-check-version]
+
+    go-install downloads and installs Go binary releases
+
+	check-version
+	  returns the latest stable go release version
+	options:
+	  -h Show this help
+	EOF
+}
+
+if [ -z "$1" ]; then
+    install_sources && go_postinst
+fi
+
+cmd=$1
+while (($# > 0)); do
+	case "$cmd" in
+		check-version|-c)
+			version; exit 0
+			;;
+		help|-h)
+			usage; exit 0
+			;;
+        *)
+			usage; exit 1
+            ;;
+    esac
+done
