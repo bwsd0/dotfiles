@@ -14,3 +14,6 @@ export PATH=${HOME}/.local/bin:${PATH}
 
 # cdpath
 export CDPATH=${CDPATH}:${GOPATH}/src/github.com:${GOPATH}/src/golang.org:${GOPATH}/src
+
+PLAN9=/usr/local/plan9 export PLAN9
+PATH=$PATH:$PLAN9/bin export PATH
