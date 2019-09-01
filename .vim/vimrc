@@ -198,6 +198,7 @@ au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=2 sw=2
 au BufNewFile,BufRead *.json setlocal expandtab ts=2 sw=2
 au BufNewFile,BufRead *.go set filetype=go
 au BufNewFile,BufRead *.msmtprc set filetype=msmtp
+au BufNewfile,BufRead *.tex set filetype=tex
 
 autocmd FileType msmtp setlocal syntax=msmtp
 autocmd FileType fstab,systemd set noexpandtab
@@ -205,6 +206,7 @@ autocmd FileType sh set noexpandtab
 autocmd FileType gitcommit setlocal spell
 autocmd FileType APKBUILD setlocal filetype=sh
 autocmd FileType go setlocal syntax=go
+autocmd FileType tex setlocal syntax=tex
 
 " c
 autocmd FileType c setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
