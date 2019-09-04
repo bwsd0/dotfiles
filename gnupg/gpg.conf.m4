@@ -34,6 +34,14 @@ with-subkey-fingerprint
 # the agent before it asks for a passphrase.
 use-agent
 
+# When using --refresh-keys, if the key in question has a preferred keyserver
+# URL, then disable use of that preferred keyserver to refresh the key from
+keyserver-options no-honor-keyserver-url
+
+# When searching for a key with --search-keys, include keys that are marked on
+# the keyserver as revoked
+keyserver-options include-revoked
+
 # Algorithm and Ciphers
 personal-cipher-preferences AES256 AES192 AES CAST5
 

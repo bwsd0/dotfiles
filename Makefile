@@ -70,6 +70,7 @@ gnupg/gpg.conf: gnupg/gpg.conf.m4
 	$(Q)$(M4) \
 		-D GNUPGHOME=$(GNUPGHOME) \
 		-D KEYSERVER=$(KEYSERVER) \
+		-D KEY=$(KEY) \
 		$< > $@
 
 .PHONY: .msmtprc
