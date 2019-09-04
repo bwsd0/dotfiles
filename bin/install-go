@@ -6,12 +6,12 @@ set -e
 
 ARCH=${ARCH-amd64}
 MIRROR="https://storage.googleapis.com/golang/"
-
+VERIFY_RELSIG=1
 # alternate official mirror
 #MIRROR="https://golang.org/dl/"
 
 # list of release candidates and/or specific versions of Go be installed
-EXTRA_VERSIONS=( go1.13rc1 )
+EXTRA_VERSIONS=()
 
 version() {
 	ver=$(curl --retry 3 -sSL "https://golang.org/VERSION?m=text")
@@ -49,13 +49,20 @@ install_sources() {
 	KERNEL=$(uname -s | tr '[:upper:]' '[:lower:]')
     GO_RELEASE="${MIRROR}${GO_VERSION}.${KERNEL}-${ARCH}.tar.gz"
     GO_SHA256=$(curl -sSL "${GO_RELEASE}.sha256")
-    GO_GPGSIG=$(curl -sSL "${GO_RELEASE}.asc")
-    echo "$GO_GPGSIG"
 
 	curl -sSL "$GO_RELEASE" -o golang.tar.gz \
-        && echo "$GO_SHA256" golang.tar.gz | sha256sum -c - \
-        && sudo tar -C /usr/local -xzf golang.tar.gz \
-        && rm golang.tar.gz
+		&& echo "$GO_SHA256" golang.tar.gz | sha256sum -c -
+
+	if [ -n "$VERIFY_RELSIG" ]; then
+		GO_GPGPUBKEY=$(curl -sSL \
+			https://dl-ssl.google.com/linux/linux_signing_key.pub)
+		echo "$GO_GPGPUBKEY" | gpg --import
+		curl -sSL "${GO_RELEASE}.asc" -o "rel.sig" \
+			&& gpg --verify "rel.sig" golang.tar.gz \
+			&& rm -rf rel.sig
+	fi
+
+	sudo tar -C /usr/local -xzf golang.tar.gz && rm golang.tar.gz
 
 	# rebuild standard library
 	sudo chown -R "${USER}" /usr/local/go/pkg
@@ -103,7 +110,7 @@ usage() {
 	cat <<-EOF
 	Usage: $(basename "$0") [-c|-check-version]
 
-    go-install downloads and installs Go binary releases
+		go-install downloads and installs Go binary releases
 
 	check-version
 	  returns the latest stable go release version
@@ -120,7 +127,7 @@ cmd=$1
 while (($# > 0)); do
 	case "$cmd" in
 		check-version|-c)
-			version; exit 0
+			echo $(version); exit 0
 			;;
 		help|-h)
 			usage; exit 0
