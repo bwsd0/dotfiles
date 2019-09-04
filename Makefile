@@ -201,7 +201,7 @@ GPG_FILES = gnupg/gpg.conf \
 install-gnupg: $(GPG_FILES) ## install gnupg
 	$(Q)mkdir -m 0700 -p -- $(DESTDIR)/$(GNUPGHOME)
 	$(Q)for i in $(GPG_FILES); do \
-		$(call cmd_install_many) -D -m 600 $$i $(DESTDIR)/$(GNUPGHOME)/$$i; \
+		$(call cmd_install_many) -D -m 600 $$i $(DESTDIR)/$(GNUPGHOME); \
 	done
 
 MUTT_RCS = mutt/muttrc \

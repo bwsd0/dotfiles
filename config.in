@@ -4,7 +4,7 @@ EMAIL = "barrywasdell@gmail.com"
 KEY = 1444995EA28E4606A75BD7327BC21207AB08D788
 
 # GPG
-GNUPGHOME := .gnupg
+GNUPGHOME ?= .gnupg
 KEYSERVER = pgp.mit.edu
 
 # msmtp and mbsync
