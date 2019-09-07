@@ -2,14 +2,21 @@
 set -e
 set -o pipefail
 
-errors=()
+OPTS=${OPTS:-}
+if [ ! -z "$2" ]; then
+	OPTS="$2"
+	shift;
+fi
 
-for f in $(find . -type f -not -path '*.git*' | sort -u); do
-	if file "$f" | grep -q -E "POSIX shell|Bourne-Again shell script"; then
+errors=()
+srcs=$(git diff --cached --name-only --diff-filter=ACM HEAD | sort -u)
+
+for sh in $srcs; do
+	if file "$sh" | grep -qlE "POSIX shell|Bourne-Again shell script"; then
 		{
-			shellcheck "$f"
+			shellcheck "$OPTS" -f gcc "$sh"
 		} || {
-			errors+=("$f")
+			errors+=("$sh")
 		}
 	fi
 done

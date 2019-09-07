@@ -52,7 +52,6 @@ TARGETS = install-bin \
 
 default: $(GENERATED_FILES)
 all: $(TARGETS)
-test: shellcheck ## run all tests
 
 .PHONY: .gitconfig
 git/.gitconfig: git/gitconfig.m4
@@ -252,8 +251,9 @@ install-offlineimap: $(DESTDIR)/.offlineimaprc
 $(DESTDIR)/.offlineimaprc: offlineimap/.offlineimaprc
 	$(call cmd_install_one) -m 644 $< $@
 
-shellcheck: ## run shellcheck tests on scripts
-	$(shell ./test.sh)
+.PHONY: test
+test: ## run shellcheck tests on scripts
+	./test.sh $(SHELLCHECKOPTS)
 
 .PHONY: install
 install: $(TARGETS)
