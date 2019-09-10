@@ -13,6 +13,8 @@ elseif exists('b:is_kornshell')
   unlet! b:is_sh b:is_posix
 elseif exists('b:is_posix')
   unlet! b:is_sh
+elseif exists('b:is_rcshell')
+  unlet! b:is_sh b:is_posix b:is_kornshell b:is_bash
 endif
 
 " The syntax highlighter seems to flag '/baz' in '"${foo:-"$bar"/baz}"' as an

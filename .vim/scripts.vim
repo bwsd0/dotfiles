@@ -53,6 +53,11 @@ elseif s:line =~# '\<sh\>'
   let b:is_posix = 1
   setfiletype sh
 
+" Plan9 shell/rc shell
+elseif s:line =~# '\<rc\>'
+  let b:is_rcshell = 1
+  setfiletype rcshell
+
 " TCL
 elseif s:line =~# '\<\%(tcl\|wish\)\>'
   setfiletype tcl

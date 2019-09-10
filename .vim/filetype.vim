@@ -416,6 +416,12 @@ augroup filetypedetect
         \ let b:is_posix = 1
         \|setfiletype sh
 
+  autocmd BufNewFile,BufRead
+        \ ?*.rc
+        \,rcmain
+        \ let b:is_rcshell = 1
+        \|setfiletype rcshell
+
   " SQL
   autocmd BufNewFile,BufRead
         \ ?*.sql
