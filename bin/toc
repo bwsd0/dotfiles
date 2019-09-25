@@ -54,6 +54,7 @@ toc="$(
 
 		# sections headings are lowercased and special escape
 		esc = tolower($0)
+		gsub(/^[ \t]+/, "", esc)
 		gsub(/ /, "-", esc)
 		gsub(/[\/?!:\[\]`.,()*;{}+=<>~\$|#@&]/, "", esc)
 		printf "%s[%s](#%s)\n", prefix, $0, esc

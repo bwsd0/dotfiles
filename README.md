@@ -3,13 +3,13 @@ This repository contains personal configuration files, scripts and
 settings for a `home/` directory.
 
 <!-- BEGIN generated code DO NOT EDIT. -->
-1.	[ dotfiles](#-dotfiles)
-	1.	[ Installation](#-installation)
-	2.	[ Configuration](#-configuration)
-		1.	[ Environment](#-environment)
-	3.	[ Test](#-test)
-	4.	[ See also](#-see-also)
-	5.	[ License](#-license)
+1.	[dotfiles](#dotfiles)
+	1.	[Installation](#installation)
+	2.	[Configuration](#configuration)
+		1.	[Environment](#environment)
+	3.	[Test](#test)
+	4.	[See also](#see-also)
+	5.	[License](#license)
 <!-- END generated code DO NOT EDIT. -->
 
 ## Installation
