@@ -20,8 +20,20 @@ man() {
 		man "$@"
 }
 
-pgp-export-pubkey() {
-    gpg2 --export --armor "$EMAIL"
+9man() {
+	9 man "$@" | $MANPAGER
+}
+
+gpg-pubkey() {
+	gpg2 --export --armor "$KEY"
+}
+
+godoc() {
+	go doc "$@" | $MANPAGER
+}
+
+gohelp() {
+	go help "$@" | $MANPAGER
 }
 
 # perform a DNS lookup with ANY query returning must useful info
@@ -30,7 +42,7 @@ digany() {
 }
 
 # perform a reverse DNS lookup and return only the result
-rdns() {
+rev-dns() {
 	dig -x "$1" +short
 }
 
@@ -64,17 +76,5 @@ cdgo() {
 	fi
 
 	# cd to the first matched path
-	cd "${godirs[0]}"; return 0
-}
-
-# signin (sesssion) into a 1password account or subdomain
-op-signin() {
-    local subdomain
-    subdomain="$1"
-    if [ -z "$1" ]; then
-        subdomain=my
-    fi
-
-    OP_SESSION=$(op signin "$subdomain" --output=raw)
-    export OP_SESSION
+	cd "${godirs[0]}" || return 0
 }
