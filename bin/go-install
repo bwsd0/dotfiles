@@ -1,13 +1,41 @@
 #!/bin/bash
+##
+# Usage: go-install [-h] [-c]
 #
-# go-install downloads and installs the latest Go binary release for linux
-# systems.
+#	go-install downloads and installs Go binary releases
+#
+# Options and environment variables:
+#
+# ARCH
+#	Host CPU architecture. Options: x86_64, x86, armv8, armv6l,
+#	s390x. The default is the host's architecture. See
+#	https://golang.org/doc/install/source for a list of
+#	instruction sets supported by the go compiler.
+#
+# MIRROR
+#	Mirror to download releases from. (default:
+#	https://storage.googleapis.com/golang/)
+#
+# VERIFY_RELSIG
+#	Verify GPG release signatures (default: true)
+#
+# EXTRA_VERSIONS
+#	Extra versions of go can be installed which may be useful when
+#	ensuring package tests pass on multiple versions of Go.
+#
+# -c, check-version
+#	Returns the latest stable go release version and exit.
+#
+# -h, help
+#	Show this help message and exit.
+##
 set -e
 
-ARCH=${ARCH-amd64}
+ARCH=${ARCH:-}
 MIRROR="https://storage.googleapis.com/golang/"
 VERIFY_RELSIG=1
-# alternate official mirror
+
+# alternate mirror
 #MIRROR="https://golang.org/dl/"
 
 # list of release candidates and/or specific versions of Go be installed
@@ -15,40 +43,42 @@ EXTRA_VERSIONS=()
 
 version() {
 	ver=$(curl --retry 3 -sSL "https://golang.org/VERSION?m=text")
-    if [ -z "$ver" ]; then
-        echo "failed to query latest golang version" || exit 1
-    fi
+	if [ -z "$ver" ]; then
+		echo "failed to query latest golang version" || exit 1
+	fi
 
-    printf "%s" "$ver"
+	printf "%s" "$ver"
 }
 
-install_sources() {
-    GO_VERSION=$(version)
-    export GO_VERSION
+install_go() {
+	GO_VERSION=$(version)
+	export GO_VERSION
 
-    GO_SRC=/usr/local/go
-    export GO_SRC
+	GO_SRC=/usr/local/go
+	export GO_SRC
 
-    if [ -x "$(command -v go)" ]; then
-        ver=$(go tool dist version \
-            | grep -E '^(go[0-9]+\.[0-9]+)([\.]?[0-9]*)($|rc|beta|\.)')
+	if [ -x "$(command -v go)" ]; then
+		ver=$(go tool dist version \
+			| grep -E '^(go[0-9]+\.[0-9]+)([\.]?[0-9]*)($|rc|beta|\.)')
 
-        if [ "$GO_VERSION" == "$ver" ]; then
-            echo "go distribution up to date: $GO_VERSION" && exit 0
-        fi
-    fi
+		if [ "$GO_VERSION" == "$ver" ]; then
+			echo "go up to date ($GO_VERSION)" && exit 0
+		fi
+	fi
 
 	if [ -d "$GO_SRC" ]; then
 		sudo rm -rf "$GO_SRC"
 	fi
-    if [ -d "$GOPATH" ]; then
-	    sudo rm -rf "$GOPATH"
-    fi
+	if [ -d "$GOPATH" ]; then
+		sudo rm -rf "$GOPATH"
+	fi
 
 	(
 	KERNEL=$(uname -s | tr '[:upper:]' '[:lower:]')
-    GO_RELEASE="${MIRROR}${GO_VERSION}.${KERNEL}-${ARCH}.tar.gz"
-    GO_SHA256=$(curl -sSL "${GO_RELEASE}.sha256")
+	test -n "$ARCH" || ARCH=$(cc -dumpmachine 2>/dev/null) || ARCH="unknown"
+	ARCH=$(normalize_arch "$ARCH")
+	GO_RELEASE="${MIRROR}${GO_VERSION}.${KERNEL}-${ARCH}.tar.gz"
+	GO_SHA256=$(curl -fsSL "${GO_RELEASE}.sha256")
 
 	curl -sSL "$GO_RELEASE" -o golang.tar.gz \
 		&& echo "$GO_SHA256" golang.tar.gz | sha256sum -c -
@@ -65,7 +95,7 @@ install_sources() {
 	sudo tar -C /usr/local -xzf golang.tar.gz && rm golang.tar.gz
 
 	# rebuild standard library
-	sudo chown -R "${USER}" /usr/local/go/pkg
+	sudo chown -R "${USER}" "${GO_SRC}/pkg"
 	CGO_ENABLED=0 go install -a -installsuffix cgo std
 	)
 
@@ -75,59 +105,46 @@ install_sources() {
     done
 }
 
-go_postinst() {
-	(
-	set -x
-	set +e
+fail () { echo "$*" >&2 ; exit 1 ; }
 
-    for tool in golang.org/x/tools/cmd/{cover,goimports,gorename}; do
-        go get "$tool"
-    done
-
-    go get golang.org/x/lint/golint
-    go get golang.org/x/net
-
-	projects=( bwasd/poop bwasd/plumb )
-	for proj in "${projects[@]}"; do
-		owner=$(dirname "$proj")
-		repo=$(basename "$proj")
-
-		if [ -d "${HOME}/${repo}" ]; then
-			rm -rf "${HOME:?}/${repo}"
-		fi
-
-		mkdir -p "${GOPATH}/src/github.com/${owner}"
-
-		if [ ! -d "${GOPATH}/src/github.com/${proj}" ]; then
-            git -C "${GOPATH}/src/github.com/${owner}" \
-                clone "git@github.com:${proj}.git"
-		fi
-	done
-    )
+fail_unless_root() {
+    if [ "$(id -u)" = "0" ]; then
+		fail "$0: must be run as root"
+		exit 1
+	fi
 }
 
-usage() {
-	cat <<-EOF
-	Usage: $(basename "$0") [-c|-check-version]
-
-		go-install downloads and installs Go binary releases
-
-	check-version
-	  returns the latest stable go release version
-	options:
-	  -h Show this help
-	EOF
+normalize_arch() {
+	case "$1" in
+		x86-64* | x86_64*)	echo 'amd64' ;;
+		x86* | i[3456]86*)	echo '386' ;;
+		armv6)				echo 'armv6l' ;;
+		armv8)				echo 'arm64' ;;
+		s390x*)				echo 's390x' ;;
+		#ppc64)				echo 'ppc64' ;;
+		#ppc64le)			echo 'ppc64le' ;;
+		#mips | mipsle)		echo 'mips32le' ;;
+		#mips64, mips64le)	echo 'mips64le'
+		unknown) fail "$0: unable to detect arch" ;;
+		*)	fail "$0: unknown or unsupported target \"$1\"" ;;
+	esac
 }
 
 if [ -z "$1" ]; then
-    install_sources && go_postinst
+	fail_unless_root
+    install_go && exit 0
 fi
 
-cmd=$1
+usage() {
+	sed -En '/^##$/,/^##$/p' "$0" | sed -E 's/^# ?//; 1d;$d;'
+}
+
+cmd="$1"
 while (($# > 0)); do
 	case "$cmd" in
 		check-version|-c)
-			echo $(version); exit 0
+			# shellcheck disable=2091
+			$(version); exit 0
 			;;
 		help|-h)
 			usage; exit 0

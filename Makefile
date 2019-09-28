@@ -148,7 +148,7 @@ $(DESTDIR)/.lesskey: less/.lesskey
 
 BIN_FILES = $(addprefix bin/,setup-debian \
 			install-kernel \
-			install-go \
+			go-install \
 			ls-git \
 			toc \
 			web)
