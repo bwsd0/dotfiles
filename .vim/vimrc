@@ -51,7 +51,7 @@ if exists('+cursorline')
   endif
 endif
 
-set number
+set nonumber
 
 set colorcolumn=80
 
