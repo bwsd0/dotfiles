@@ -105,7 +105,7 @@ install_go() {
     done
 }
 
-fail () { echo "$*" >&2 ; exit 1 ; }
+fail () { echo >&2 "$*" ; exit 1 ; }
 
 fail_unless_root() {
     if [ "$(id -u)" = "0" ]; then
@@ -116,16 +116,16 @@ fail_unless_root() {
 
 normalize_arch() {
 	case "$1" in
-		x86-64* | x86_64*)	echo 'amd64' ;;
+		x86-64* | x86_64* | amd64*)	echo 'amd64' ;;
 		x86* | i[3456]86*)	echo '386' ;;
-		armv6)				echo 'armv6l' ;;
-		armv8)				echo 'arm64' ;;
-		s390x*)				echo 's390x' ;;
-		#ppc64)				echo 'ppc64' ;;
-		#ppc64le)			echo 'ppc64le' ;;
-		#mips | mipsle)		echo 'mips32le' ;;
+		armv6)	echo 'armv6l' ;;
+		armv8)	echo 'arm64' ;;
+		s390x*)	echo 's390x' ;;
+		#ppc64)	echo 'ppc64' ;;
+		#ppc64le)	echo 'ppc64le' ;;
+		#mips | mipsle)	echo 'mips32le' ;;
 		#mips64, mips64le)	echo 'mips64le'
-		unknown) fail "$0: unable to detect arch" ;;
+		unknown)	fail "$0: unable to detect arch" ;;
 		*)	fail "$0: unknown or unsupported target \"$1\"" ;;
 	esac
 }
@@ -144,7 +144,7 @@ while (($# > 0)); do
 	case "$cmd" in
 		check-version|-c)
 			# shellcheck disable=2091
-			$(version); exit 0
+			echo "$(version)"; exit 0
 			;;
 		help|-h)
 			usage; exit 0
