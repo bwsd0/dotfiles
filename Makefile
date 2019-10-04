@@ -10,7 +10,6 @@ prefix ?=
 bindir ?= $(prefix)/.local/bin
 
 INSTALL = install
-TOC		:= $(srcdir)/bin/toc
 CHMOD	:= chmod
 SED 	:= sed
 M4		:= m4
@@ -257,9 +256,6 @@ test: ## run shellcheck tests on scripts
 
 .PHONY: install
 install: $(TARGETS)
-
-readme-update: ## update README
-	$(Q)$(shell $(TOC)) README.md
 
 .PHONY: uninstall
 uninstall: ## uninstall targets
