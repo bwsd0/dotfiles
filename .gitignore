@@ -2,7 +2,6 @@
 .gitconfig
 gpg.conf
 .msmtprc
-.offlineimaprc
 .mbsyncrc
 /mutt/muttrc
 *.swp

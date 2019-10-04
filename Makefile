@@ -90,15 +90,6 @@ mutt/muttrc: mutt/muttrc.m4
 		-D MAILDIR=$(MAILDIR) \
 		$< > $@
 
-.PHONY: .offlineimaprc
-offlineimap/.offlineimaprc: offlineimap/offlineimaprc.m4
-	$(Q)$(kecho) '  GEN		$@';
-	$(Q)$(M4) \
-		-D USERNAME=$(USER) \
-		-D EMAIL=$(EMAIL) \
-		-D MAILDIR=$(MAILDIR) \
-		$< > $@
-
 .PHONY: .mbsyncrc
 mbsync/.mbsyncrc: mbsync/mbsyncrc.m4 ## generate mbsyncrc
 	$(Q)$(kecho) '  GEN		$@';
