@@ -322,27 +322,6 @@ install_docker() {
 	apt clean
 }
 
-install_op() {
-	if [ -x "$(command -v op)" ]; then
-		printf "op is already installed"; exit 0
-	fi
-
-	local host="https://cache.agilebits.com/dist/1P/op/pkg"
-	local ver="v0.5.7"
-	local tmpdir=$(mktemp -d)
-	OP_RELEASE="${host}/${ver}op_linux_amd64_${ver}.zip"
-
-	curl -sS "$OP_RELEASE" -o "$tmpdir"/op.zip
-	unzip "$tmpdir/op.zip"
-
-    # TODO: GPG key-ids are forgeable
-	gpg --recv-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
-	gpg --verify op.sig op
-
-	mv op /usr/local/bin
-	rm op.sig
-}
-
 install_signal() {
 	if [ -x "$(command -v signal-desktop)" ]; then
 		printf "signal-desktop is already installed\\n"; exit 0
@@ -411,13 +390,11 @@ while (($# > 0)); do
 			;;
 		install)
 			shift
-			inst="$@"
 			for i in "$@"
 			do
 				case "$i" in
 					docker) install_docker ;;
 					signal) install_signal ;;
-					op) install_op ;;
 					*) echo "huh? $i" >&2 ;;
 				esac
 			done
