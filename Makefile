@@ -236,11 +236,6 @@ install-mbsync: $(DESTDIR)/.mbsyncrc
 $(DESTDIR)/.mbsyncrc: mbsync/.mbsyncrc
 	$(call cmd_install_one) -m 644 $< $@
 
-.PHONY: install-offlineimap
-install-offlineimap: $(DESTDIR)/.offlineimaprc
-$(DESTDIR)/.offlineimaprc: offlineimap/.offlineimaprc
-	$(call cmd_install_one) -m 644 $< $@
-
 .PHONY: test
 test: ## run shellcheck tests on scripts
 	./test.sh $(SHELLCHECKOPTS)
