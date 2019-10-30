@@ -28,6 +28,21 @@
 #
 # -h, help
 #	Show this help message and exit.
+#
+# BUGS
+#	getgo golang.org/tools/cmd/getgo already provides a
+#	"proof-of-concept" installer for Go, and gotip from golang.org/dl
+#	for compiling the go command from the development tree.
+#
+#	Not all OSes have been tested to work (MacOS, BSD, Windows and
+#	Plan9).
+#
+#	The tool removes $GOPATH, potentially destroying any uncommitted
+#	work.
+#
+#	A better version of this tool should be re-written in Go or try to
+#	improve golang.org/tools/cmd/getgo
+#
 ##
 set -e
 
