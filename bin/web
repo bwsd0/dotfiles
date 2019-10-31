@@ -1,34 +1,35 @@
 #!/bin/sh
 
 unix() {
-    case "${BROWSER:=firefox}" in
-    *firefox*|*ff*)
-        $BROWSER "$@"
-        ;;
-    *ff-noprofile*)
-        $BROWSER "$@" --new-instance --profile $(mktemp -d)
-        ;;
-    ?*)
-        $BROWSER "$@"
-        ;;
-    esac
+	case "${BROWSER:=firefox}" in
+	*firefox*|*ff)
+		"$BROWSER" --new-tab "$@" || $BROWSER "$@"
+		;;
+	*--no-profile*)
+		"$BROWSER" "$@" --new-instance --profile "$(mktemp -d)"
+		;;
+	?*)
+		"$BROWSER" "$@"
+		;;
+	esac
 }
 
 if [ $# = 0 ]
 then
-    unix about:blank
+	unix about:blank
 else
-    for i in "$@"
-    do
-        if [ -f "$i" ]
-        then
-            p=$(pwd | sed 's/ /%20/g')
-            i=$(echo $i | sed 's/ /%20/g')
-            i=file://$i
-        else
-            i=$(echo $i | tr -d ' ')
-        fi
-        echo p "$i"
-        unix $i
-    done
+	for i in "$@"
+	do
+		if [ -f "$i" ]
+		then
+			p=$(pwd | sed 's/ /%20/g')
+			i=$(echo "$i" | sed 's/ /%20/g')
+			i=$(cleanname -d "$p" "$i")
+			i=file://$i
+		else
+			i=$(echo "$i" | tr -d ' ')
+		fi
+		echo p "$i"
+		unix "$i"
+	done
 fi
