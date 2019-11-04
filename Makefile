@@ -126,7 +126,7 @@ $(DESTDIR)/.ssh/config: ssh/config
 GIT_FILES = git/.gitconfig git/.gitignore_global
 .PHONY: install-git
 install-git: $(GIT_FILES)  ## install global git options
-	$(Q)for i in $(BASH_RCS); do \
+	$(Q)for i in $(GIT_FILES); do \
 		$(call cmd_install_many) -D -m 644 $$i $(DESTDIR); \
 	done
 

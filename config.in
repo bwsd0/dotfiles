@@ -2,6 +2,7 @@ NAME = 'Barry Wasdell'
 USER = bwasd
 EMAIL = "barrywasdell@gmail.com"
 KEY = 1444995EA28E4606A75BD7327BC21207AB08D788
+EDITOR = vim
 
 # GPG
 GNUPGHOME ?= .gnupg
