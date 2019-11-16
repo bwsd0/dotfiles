@@ -6,6 +6,9 @@
 #
 # Options and environment variables:
 #
+# OS
+#	Host OS. Options: Linux, Darwin, Windows, Plan9.
+#
 # ARCH
 #	Host CPU architecture. Options: x86_64, x86, armv8, armv6l,
 #	s390x. The default is the host's architecture. See
@@ -34,7 +37,7 @@
 #	"proof-of-concept" installer for Go, and gotip from golang.org/dl
 #	for compiling the go command from the development tree.
 #
-#	Not all OSes have been tested to work (MacOS, BSD, Windows and
+#	Not all OSes have been tested to work (BSD, Windows and
 #	Plan9).
 #
 #	The tool removes $GOPATH, potentially destroying any uncommitted
@@ -46,6 +49,7 @@
 ##
 set -e
 
+OS=${OS:-}
 ARCH=${ARCH:-}
 MIRROR="https://storage.googleapis.com/golang/"
 VERIFY_RELSIG=1
@@ -55,6 +59,25 @@ VERIFY_RELSIG=1
 
 # list of release candidates and/or specific versions of Go be installed
 EXTRA_VERSIONS=()
+
+if [ "$(uname)" = Darwin ]; then
+	# see: https://github.com/golang/go/issues/23011
+	if [ "$(sw_vers -productVersion | cut -d. -f2)" -lt 10 ]; then
+		fail "$0: OS X platform older than 10.10" || exit 1
+	fi
+	# On Darwin, uname -m cannot be trusted.
+	if sysctl hw.optional.x86_64 | grep -q ': 1'; then
+		ARCH=x86_64
+	fi
+
+	OS=Darwin
+	# disabled; see: https://github.com/golang/go/issues/35309
+	VERIFY_RELSIG=0
+fi
+
+if [ "$(uname)" = Linux ]; then
+	OS=Linux
+fi
 
 version() {
 	ver=$(curl --retry 3 -sSL "https://golang.org/VERSION?m=text")
