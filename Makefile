@@ -139,6 +139,8 @@ $(DESTDIR)/.lesskey: less/.lesskey
 BIN_FILES = $(addprefix bin/,setup-debian \
 			install-kernel \
 			go-install \
+			goman \
+			gh-repos \
 			ls-git \
 			toc \
 			web)

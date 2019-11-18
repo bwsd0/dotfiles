@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+# clone all github repos from an organization over SSH
+
+ORG=${ORG:-"$1"}
+OAUTH_TOKEN=${OAUTH_TOKEN:-"$2"}
+
+if [ -z "$ORG" ] || [ -z "$OAUTH_TOKEN" ]; then
+	echo "usage: $(basename "$0") [org] [token]" >&2; exit 1;
+fi
+
+curl -H "Authorization: token ${OAUTH_TOKEN}" \
+	-sSL "https://api.github.com/orgs/${ORG}/repos?per_page=200" \
+	| jq ".[] | .ssh_url" \
+	| xargs -L1 -I'{}' git clone '{}'
