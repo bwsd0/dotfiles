@@ -39,6 +39,7 @@ TARGETS = install-bin \
 		  install-x \
 		  install-tmux \
 		  install-psqlrc \
+		  install-mycnf \
 		  install-abook \
 		  install-msmtp \
 		  install-mbsync \
@@ -226,6 +227,11 @@ install-x: X/.Xresources X/.xinitrc ## install X
 .PHONY: install-psqlrc
 install-psqlrc: $(DESTDIR)/.psqlrc ## install psqlrc
 $(DESTDIR)/.psqlrc: psql/.psqlrc
+	$(call cmd_install_one) -m 644 $< $@
+
+.PHONY: install-mycnf
+install-mycnf: $(DESTDIR)/.my.cnf ## install mysql config
+$(DESTDIR)/.my.cnf: mysql/.my.cnf
 	$(call cmd_install_one) -m 644 $< $@
 
 .PHONY: install-msmtp
