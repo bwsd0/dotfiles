@@ -40,7 +40,6 @@ TARGETS = install-bin \
 		  install-tmux \
 		  install-psqlrc \
 		  install-mycnf \
-		  install-abook \
 		  install-msmtp \
 		  install-mbsync \
 		  install-vim \
@@ -209,11 +208,6 @@ install-mutt: $(MUTT_RCS) ## install mutt configuration
 	$(Q)for i in $(MUTT_RCS); do \
 		$(call cmd_install_many) -D -m 644 $$i $(DESTDIR)/.mutt; \
 	done
-
-.PHONY: install-abook
-install-abook: $(DESTDIR)/.abook/abookrc
-$(DESTDIR)/.abook/abookrc: abook/abookrc  ## install abookrc
-	$(call cmd_install_one) -D -m  644 $< $@
 
 .PHONY: install-tmux
 install-tmux: $(DESTDIR)/.tmux.conf ## install tmux.conf

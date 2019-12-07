@@ -1,5 +1,4 @@
 # Addresses
-set query_command   = 'abook --mutt-query %s'
 set realname        = 'NAME'
 set from            = 'EMAIL'
 set use_domain      = yes
@@ -83,15 +82,12 @@ set pgp_auto_decode = yes
 # Vim-like bindings
 bind index gg first-entry
 bind index G  last-entry
+
 bind pager gg top
 bind pager G  bottom
 
 set date_format     = "%y-%m-%d %T %M %S"
 set index_format    = "%4C %Z %[!%b %e at %I:%M %p] %.20n %s%* -- (%P)"
-
-macro index,pager A \
-    '<pipe-message>abook --add-email-quiet<enter>' \
-    'Add sender address to abook'
 
 # Colors
 source ~/.mutt/mutt-dark-16.muttrc
