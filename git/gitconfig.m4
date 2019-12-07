@@ -16,7 +16,7 @@
     # treat spaces before tabs, and all kinds of whitespace as an error
     whitespace = space-before-tab,-indent-with-non-tab,trailing-space
     precomposeUnicode = true
-    excludesfile = ~/.gitignore
+    excludesfile = ~/.gitignore_global
     attributesfile = ~/.gitattributes
     hooksPath = ~/dotfiles/git/templates/hooks
 
