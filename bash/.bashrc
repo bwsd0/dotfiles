@@ -94,12 +94,10 @@ fi
 GPG_TTY=$(tty)
 export GPG_TTY
 
-gpg-connect-agent /bye
 unset SSH_AGENT_PID
 if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
 	export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 fi
-alias ssh="gpg-connect-agent updatestartuptty /bye >/dev/null"
 
 if [[ "$UID" -ne 0 ]]; then
 	PS1="\[\033[31m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\W\[\033[m\]\$ "
