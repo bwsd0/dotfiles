@@ -46,17 +46,6 @@ rev-dns() {
 	dig -x "$1" +short
 }
 
-# Fetch RFC documents from IETF site
-rfc() {
-	if [ $# -eq 0 ] ; then
-		printf >&2 "rfc: missing RFC number"
-		exit 2
-	fi
-
-	rn="$1"
-	curl -fsSL "https://tools.ietf.org/rfc/rfc""$rn"
-}
-
 # shortcut to cd to project directory in GOPATH
 cdgo() {
 	local d=$1
