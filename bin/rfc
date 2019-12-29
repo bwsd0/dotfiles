@@ -16,17 +16,33 @@ if [ ! -f "$lib/index" ]; then
 		| sed 's/^[0-9]/rfc&/' > "$lib/index"
 fi
 
-if [[ ! "$*" =~ ^[0-9]{}+$ ]]; then
+if [[ ! "$*" =~ ^[0-9]+$ ]]; then
 	grep "$*" "$lib/index" \
 		| grep -E -o '^rfc[0-9]+ [A-Za-z \t,_!\(\)"'':-\#;]+\.' \
 		| grep "$*" \
 		|| echo >&2 "$(basename "$0"): not found"; exit 1
-	exit 0
 fi
 
 r="rfc$1.txt"
 if [ ! -e "$lib/$r" ]; then
-	curl -sSL "https://www.rfc-editor.org/rfc/$r" -o "$lib/$r"
+	curl -fsSL "https://www.rfc-editor.org/rfc/$r" -o "$lib/$r" || exit 1
 fi
 
-col -x <"$lib/$r" | less -X
+fmtrfc() {
+	awk '
+		BEGIN {
+			RS = ""
+			ORS = "\n\n"
+		}
+
+		# skip paragraphs with ^L in them
+		/\f/ { next }
+
+		# strip control characters, except newline and tab
+		{ gsub(/[\a\b\r\v]/, "") }
+
+		length($0)
+	' "$1"
+}
+
+col -x <"$lib/$r" | fmtrfc | less -X
