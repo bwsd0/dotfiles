@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Usage: udict [word...]
+set -e
+set -o pipefail
+
+curl -fsSL "https://api.urbandictionary.com/v0/define?page=1&term=$1" \
+	| jq -e -r '.[] | .[] | .permalink, .definition | tostring' | \
+	while read key ; do
+		echo "$key" \
+			| col -x \
+			| fmt -w 72 \
+			| less -X
+	done || echo >&2 "$(basename "$0"): no definitions found for $1"; exit 1
