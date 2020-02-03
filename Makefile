@@ -137,6 +137,7 @@ $(DESTDIR)/.lesskey: less/.lesskey
 	$(Q)lesskey
 
 BIN_FILES = $(addprefix bin/,setup-debian \
+			eskom \
 			install-kernel \
 			go-install \
 			goman \
