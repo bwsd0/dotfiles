@@ -333,5 +333,3 @@ runtime! ftplugin/man.vim
 
 nnoremap <Leader>1 :Lexplore<CR>
 let g:netrw_banner = 0
-
-ab url URL
