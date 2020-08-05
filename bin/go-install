@@ -40,9 +40,6 @@
 #	Not all OSes have been tested to work (BSD, Windows and
 #	Plan9).
 #
-#	The tool removes $GOPATH, potentially destroying any uncommitted
-#	work.
-#
 #	A better version of this tool should be re-written in Go or try to
 #	improve golang.org/tools/cmd/getgo
 #
@@ -104,13 +101,6 @@ install_go() {
 		fi
 	fi
 
-	if [ -d "$GO_SRC" ]; then
-		sudo rm -rf "$GO_SRC"
-	fi
-	if [ -d "$GOPATH" ]; then
-		sudo rm -rf "$GOPATH"
-	fi
-
 	(
 	KERNEL=$(uname -s | tr '[:upper:]' '[:lower:]')
 	test -n "$ARCH" || ARCH=$(cc -dumpmachine 2>/dev/null) || ARCH="unknown"
@@ -128,6 +118,10 @@ install_go() {
 		curl -sSL "${GO_RELEASE}.asc" -o "rel.sig" \
 			&& gpg --verify "rel.sig" golang.tar.gz \
 			&& rm -rf rel.sig
+	fi
+
+	if [ -d "$GO_SRC" ]; then
+		sudo rm -rf "$GO_SRC"
 	fi
 
 	sudo tar -C /usr/local -xzf golang.tar.gz && rm golang.tar.gz
