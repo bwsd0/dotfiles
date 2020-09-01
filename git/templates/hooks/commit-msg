@@ -4,10 +4,10 @@
 MSG="$1"
 
 subject_re="/^([a-zA-Z0-9./-]+): .*[^.]$/"
-subject_alt="/^([a-zA-Z0-9./-]+|[A-Z_]+): .*[^.]$/"
+subject_alt="/^([a-zA-Z0-9./-]+|[A-Z_]+).*[^.]$/"
 
 check_msg() {
-	awk -v subject_re="$subject_re" '
+	awk -v subject_re="$subject_re_alt" '
 		BEGIN {
 			max_header_length = 50
 			max_line_length = 72
