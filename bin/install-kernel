@@ -1,6 +1,5 @@
 #!/bin/sh
 set -e
-set -o pipefail
 
 KERNELVERSION=${KERNELVERSION:-}
 
@@ -34,6 +33,17 @@ install_kernel() {
     cp "$config" "$DESTDIR"/config${suffix}
 }
 
+install_firmware() {
+	#git clone git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+
+	(
+	cd linux-firmware
+	fwdir=/lib/firmware
+	mkdir -p "${fwdir}/radeon"
+	cp radeon/R520_cp.bin ${fwdir}/radeon
+	)
+}
+
 #https://git.kernel.org/$KERNEL_VERSION
 
 kernel_version() {
@@ -50,15 +60,4 @@ kernel_version() {
     printf "%s\n" "$ver"
 }
 
-usage() {
-	cat <<-EOF
-	$(basename "$0") [COMMAND] [ARG...]
-	check-version
-		returns the latest stable kernel version
-	fetch [stable] [mainline] [next]
-		download latest {stable,mainline,next} Linux kernel tarball from
-		kernel.org
-	install-kernel
-		install a bootable kernel image
-	EOF
-}
+install_firmware

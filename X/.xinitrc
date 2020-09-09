@@ -1,8 +1,10 @@
 #!/bin/sh
 
-[ -e "$HOME"/.xrandrrc ] && . "$HOME"/.xrandrrc
+# shellcheck disable=SC1090
+[ -e "$HOME/.xrandrrc" ] && . "$HOME/.xrandrrc"
 xset -b
-xrdb -merge "$HOME"/.Xresources
+xrdb -merge "$HOME/.Xresources"
+setxkbmap -option caps:none
 
 case $1 in
 	dwm)
@@ -11,6 +13,7 @@ case $1 in
 			xsetroot -name "$(date +"%a %b %d %r")"
 			sleep 30s
 		done &
+		urxvtd -q -o -f
 		dwm
 		;;
 	rio)

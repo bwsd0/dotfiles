@@ -25,11 +25,11 @@ else
 			p=$(pwd | sed 's/ /%20/g')
 			i=$(echo "$i" | sed 's/ /%20/g')
 			i=$(cleanname -d "$p" "$i")
-			i=file://$i
+			i=file://"$i"
 		else
 			i=$(echo "$i" | tr -d ' ')
 		fi
-		echo p "$i"
+		echo p "$i" | plumb -i -d edit -a 'action=showdata'"$i"
 		unix "$i"
 	done
 fi

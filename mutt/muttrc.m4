@@ -1,13 +1,13 @@
 # Addresses
-set realname        = 'NAME'
-set from            = 'EMAIL'
+set realname        = 'Barry Wasdell'
+set from            = 'barrywasdell@gmail.com'
 set use_domain      = yes
 set use_from        = yes
 set reverse_name    = yes
 
 # Headers
 ignore *
-unignore date subject x- user-agent posted-to content-type
+unignore date subject x-user-agent posted-to content-type
 unignore to cc bcc reply-to from
 set edit_headers = yes
 
@@ -16,37 +16,39 @@ bind editor <Tab> complete-query
 bind editor ^T    complete
 
 # Files
-set editor = 'EDITOR'
+set editor = vim
 set mailcap_path = '~/.mutt/mailcap'
 set move            = no
 set send_charset    = "us-ascii:utf-8"
 set charset         = UTF-8
 
 # SMTP implementation
-set sendmail = "SENDMAIL -a USER"
+set sendmail = "/usr/bin/msmtp"
 
 # Mailbox
 #set mbox_type  = 'Maildir'
-set folder      = 'MAILDIR/work'
+set folder      = imaps://imap.gmail.com/
 
 # Sub-mailboxes
-set spoolfile   = "+INBOX"
-set mbox        = "+[Gmail]/All Mail"
-set postponed   = "+[Gmail]/Drafts"
-set record      = '+sent'
-mailboxes +INBOX
+set spoolfile       = +INBOX
+set mbox            = "imaps://imap.gmail.com/[Gmail]/All Mail"
+set postponed       = "+[Gmail]/Drafts"
+set record          = ""
 
 # Caches
 set header_cache        = '~/.cache/mutt/headers'
 set message_cachedir    = '~/.mutt/cache/bodies'
 
 # Certificates
-set certificate_file = '~/.mutt/certificates'
+#set certificate_file = '~/.mutt/certificates'
+set imap_user = barrywasdell@gmail.com
+set imap_pass = alaiiatufdefklhl
 
-#set imap_user   = 'IMAP_USER'
-#set imap_pass   = 'IMAP_PASS' # leave blank for prompt
-#set smtp_url    = "smtps://$imap_user@'SMTP_SERVER':465/"
-set signature   = "~/.mutt/signature"
+set smtp_url        = 'smtps://$imap_user@smtp.gmail.com'
+set smtp_pass       = alaiiatufdefklhl
+set ssl_starttls    = yes
+set ssl_force_tls   = yes
+set signature       = "~/.mutt/signature"
 
 # Pager
 set markers     = no

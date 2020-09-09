@@ -22,7 +22,7 @@ setup_drv() {
     *NOUVEAU*)      pkgs+=( xserver-xorg-video-nouveau ) ;;
     *Intel*)        pkgs+=( xserver-xorg-video-intel ) ;;
 	*NVIDIA*)       check_drv_abi_compat ;;
-    *ATI*|*AMD*)    pkgs+=( xserver-xorg-video-ati firmware-linux-nonfree libgl1-mesa-dri ) ;;
+    *ATI*|*AMD*)    pkgs+=( xserver-xorg-video-ati libgl1-mesa-dri ) ;;
 	*)              error 1 "invalid driver selection: %s" "$dri" ;;
 	esac
 

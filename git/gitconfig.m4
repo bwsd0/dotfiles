@@ -20,6 +20,10 @@
     attributesfile = ~/.gitattributes
     hooksPath = ~/dotfiles/git/templates/hooks
 
+[grep]
+    lineNumber = true
+    column = true
+
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
 
