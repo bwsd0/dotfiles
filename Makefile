@@ -25,23 +25,17 @@ cmd_install_many = \
 
 
 GENERATED_FILES = git/.gitconfig \
-				  gnupg/gpg.conf \
-				  mutt/muttrc \
-				  msmtp/.msmtprc \
-				  mbsync/.mbsyncrc
+				  gnupg/gpg.conf
 
 TARGETS = install-bin \
 		  install-bash \
 		  install-ssh \
 		  install-git \
 		  install-gnupg \
-		  install-mutt \
 		  install-x \
 		  install-tmux \
 		  install-psqlrc \
 		  install-mycnf \
-		  install-msmtp \
-		  install-mbsync \
 		  install-vim \
 		  install-lesskey
 
@@ -226,16 +220,6 @@ $(DESTDIR)/.psqlrc: psql/.psqlrc
 .PHONY: install-mycnf
 install-mycnf: $(DESTDIR)/.my.cnf ## install mysql config
 $(DESTDIR)/.my.cnf: mysql/.my.cnf
-	$(call cmd_install_one) -m 644 $< $@
-
-.PHONY: install-msmtp
-install-msmtp: $(DESTDIR)/.msmtprc
-$(DESTDIR)/.msmtprc: msmtp/.msmtprc
-	$(call cmd_install_one) -m 600 $< $@
-
-.PHONY: install-mbsync
-install-mbsync: $(DESTDIR)/.mbsyncrc
-$(DESTDIR)/.mbsyncrc: mbsync/.mbsyncrc
 	$(call cmd_install_one) -m 644 $< $@
 
 .PHONY: test
