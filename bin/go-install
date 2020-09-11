@@ -140,9 +140,8 @@ install_go() {
 fail () { echo >&2 "$*" ; exit 1 ; }
 
 fail_unless_root() {
-    if [ "$(id -u)" = "0" ]; then
+    if [ "$(id -u)" = '0' ]; then
 		fail "$0: must be run as root"
-		exit 1
 	fi
 }
 
@@ -150,7 +149,7 @@ normalize_arch() {
 	case "$1" in
 		x86-64* | x86_64* | amd64*)	echo 'amd64' ;;
 		x86* | i[3456]86*)	echo '386' ;;
-		armv6)	echo 'armv6l' ;;
+		arm-linux-gnueabihf | armv6)	echo 'armv6l' ;;
 		armv8)	echo 'arm64' ;;
 		s390x*)	echo 's390x' ;;
 		#ppc64)	echo 'ppc64' ;;
