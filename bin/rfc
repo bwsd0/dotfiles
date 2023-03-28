@@ -3,49 +3,56 @@
 # Usage: rfc [ keywords | nnnn ]
 set -eo pipefail
 
-if [ $# -eq 0 ] ; then
-	echo >&2 "usage: $(basename "$0") number | args..."; exit 1
+function error() {
+	echo >&2 "usage: $(basename "$0") [NUMBER] | args..."
+	exit "$1"
+}
+
+if [ $# -eq 0 ]; then
+	error 2
 fi
 
 lib="$HOME/lib/rfc"
 if [ ! -d "$lib" ]; then
-  mkdir -p "$lib"
+	mkdir -p "$lib"
 fi
 
 if [ ! -f "$lib/index" ]; then
-	curl -sSL "https://www.rfc-editor.org/rfc-index.txt" \
-		| tr '[:upper:]' '[:lower:]' \
-		| sed 's/^0*//' \
-		| sed 's/^[0-9]/rfc&/' > "$lib/index"
+  curl -sSL "https://www.rfc-editor.org/rfc-index.txt" |
+    tr '[:upper:]' '[:lower:]' |
+    sed 's/^0*//' |
+    sed 's/^[0-9]/rfc&/' >"$lib/index"
 fi
 
 if [[ ! "$*" =~ ^[0-9]+$ ]]; then
-	grep "$*" "$lib/index" \
-		| grep -E -o '^rfc[0-9]+ [A-Za-z \t,_!\(\)"'':-\#;]+\.' \
-		| grep "$*" \
-		|| echo >&2 "$(basename "$0"): not found"; exit 1
+  grep "$*" "$lib/index" |
+    grep -E -o '^rfc[0-9]+ [A-Za-z \t,_!\(\)"'':-\#;]+\.' |
+    grep "$*" ||
+    echo >&2 "$(basename "$0"): not found"
+	exit 1
 fi
 
 r="rfc$1.txt"
 if [ ! -e "$lib/$r" ]; then
-	curl -fsSL "https://www.rfc-editor.org/rfc/$r" -o "$lib/$r" || exit 1
+  curl -fsSL "https://www.rfc-editor.org/rfc/$r" -o "$lib/$r" || exit 1
 fi
 
+# shellcheck disable=SC2120
 fmtrfc() {
-	awk '
-		BEGIN {
-			RS = ""
-			ORS = "\n\n"
-		}
+  awk '
+    BEGIN {
+      RS = ""
+      ORS = "\n\n"
+    }
 
-		# skip paragraphs with ^L in them
-		/\f/ { next }
+    # skip paragraphs with ^L in them
+    /\f/ { next }
 
-		# strip control characters, except newline and tab
-		{ gsub(/[\a\b\r\v]/, "") }
+    # strip control characters, except newline and tab
+    { gsub(/[\a\b\r\v]/, "") }
 
-		length($0)
-	' "$1"
+    length($0)
+    ' "$1"
 }
 
 col -x <"$lib/$r" | fmtrfc | less -X
