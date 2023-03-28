@@ -1,14 +1,17 @@
 #!/bin/bash
 #
 # Usage: rfc [ keywords | nnnn ]
-set -e
-set -o pipefail
+set -eo pipefail
 
 if [ $# -eq 0 ] ; then
 	echo >&2 "usage: $(basename "$0") number | args..."; exit 1
 fi
 
 lib="$HOME/lib/rfc"
+if [ ! -d "$lib" ]; then
+  mkdir -p "$lib"
+fi
+
 if [ ! -f "$lib/index" ]; then
 	curl -sSL "https://www.rfc-editor.org/rfc-index.txt" \
 		| tr '[:upper:]' '[:lower:]' \
