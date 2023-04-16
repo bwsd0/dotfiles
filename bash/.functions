@@ -20,6 +20,10 @@ man() {
 		man "$@"
 }
 
+gpg_tty() {
+	echo UPDATESTARTUPTTY | gpg-connect-agent
+}
+
 9man() {
 	9 man "$@" | $MANPAGER
 }
