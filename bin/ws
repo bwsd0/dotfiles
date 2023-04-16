@@ -1,2 +1,2 @@
 #!/usr/bin/env rc
-sed -e 's! *! !g' -e 's! *$!!g' -e 's!^ *!!g'
+sed -e 's!  *! !g' -e 's! *$!!g' -e 's!^ *!!g'
