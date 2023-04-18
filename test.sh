@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 OPTS=${OPTS:-}
-if [ ! -z "$2" ]; then
+if [ -n "$2" ]; then
 	OPTS="$2"
 	shift;
 fi
