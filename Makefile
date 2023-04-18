@@ -24,8 +24,7 @@ cmd_install_many = \
 				   $(INSTALL)
 
 
-GENERATED_FILES = git/.gitconfig \
-				  gnupg/gpg.conf
+GENERATED_FILES = git/.gitconfig
 
 TARGETS = install-bin \
 		  install-bash \
@@ -56,15 +55,6 @@ git/.gitconfig: git/gitconfig.m4
 		-D GIT_SMTP_ENCRYPTION=$(GIT_SMTP_ENCRYPTION) \
 		-D GIT_SMTP_SERVER_PORT=$(GIT_SMTP_SERVER_PORT) \
 		-D EDITOR=$(EDITOR) \
-		-D KEY=$(KEY) \
-		$< > $@
-
-.PHONY: gpg.conf
-gnupg/gpg.conf: gnupg/gpg.conf.m4
-	$(Q)$(kecho) '  GEN		$@';
-	$(Q)$(M4) \
-		-D GNUPGHOME=$(GNUPGHOME) \
-		-D KEYSERVER=$(KEYSERVER) \
 		-D KEY=$(KEY) \
 		$< > $@
 
@@ -173,8 +163,7 @@ install-vim: ## install vim runtime
 	done
 
 GPG_FILES = gnupg/gpg.conf \
-			gnupg/gpg-agent.conf \
-			gnupg/dirmngr.conf
+			gnupg/gpg-agent.conf
 
 install-gnupg: $(GPG_FILES) ## install gnupg
 	$(Q)mkdir -m 0700 -p -- $(DESTDIR)/$(GNUPGHOME)
