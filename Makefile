@@ -6,7 +6,7 @@ unexport GREP_OPTIONS
 SHELL := /bin/bash
 DESTDIR ?= $(HOME)
 
-prefix ?=
+prefix ?= $(HOME)
 bindir ?= $(prefix)/.local/bin
 
 INSTALL = install
@@ -51,7 +51,10 @@ git/.gitconfig: git/gitconfig.m4
 	$(Q)$(kecho) '  GEN		$@';
 	$(Q)$(M4) \
 		-D GIT_AUTHOR_NAME=$(NAME) \
-		-D GIT_AUTHOR_EMAIL=$(EMAIL) \
+		-D GIT_AUTHOR_EMAIL=$(GIT_AUTHOR_EMAIL) \
+		-D GIT_SMTP_SERVER=$(GIT_SMTP_SERVER) \
+		-D GIT_SMTP_ENCRYPTION=$(GIT_SMTP_ENCRYPTION) \
+		-D GIT_SMTP_SERVER_PORT=$(GIT_SMTP_SERVER_PORT) \
 		-D EDITOR=$(EDITOR) \
 		-D KEY=$(KEY) \
 		$< > $@
@@ -130,21 +133,12 @@ $(DESTDIR)/.lesskey: less/.lesskey
 	$(call cmd_install_one) -m 644 $< $@
 	$(Q)lesskey
 
-BIN_FILES = $(addprefix bin/,eskom \
-			install-kernel \
-			go-install \
-			goman \
-			gh-repos \
-			ls-git \
-			toc \
-			web)
-
 .PHONY: install-bin
-install-bin: $(DESTDIR)$(bindir) ## install user scripts
-$(DESTDIR)$(bindir): $(BIN_FILES)
+install-bin: $(bindir) ## install user scripts
 	$(Q)mkdir -p -- $@
-	$(Q)$(INSTALL) -m 644 $^ $@
-	$(Q)$(CHMOD) -R +x $@
+	$(Q)for b in $(shell find ./bin -type f); do \
+		install -m 744 $$b $(bindir); \
+	done
 
 VIMDIR = .vim
 VIMRC := $(VIMDIR)/vimrc
@@ -168,9 +162,7 @@ VIM_SRCS = after/indent/gitconfig.vim \
 	syntax/msmtp.vim \
 	system.vim \
 	templates/shell.sh \
-	templates/README.md \
-	templates/index.html \
-	templates/main.c
+	templates/README.md
 
 VIM_SRCS := $(addprefix $(VIMDIR)/, $(VIM_SRCS))
 VIM_SRCS += $(VIMRC)

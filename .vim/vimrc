@@ -325,8 +325,6 @@ if has('autocmd')
   augroup templates
     autocmd BufNewFile *.[sh|bash] 0r ~/.vim/templates/shell.sh
     autocmd BufNewFile [README]*.[md|markdown] 0r ~/.vim/templates/README.md
-    autocmd BufNewFile main.c 0r ~/.vim/templates/main.c
-    autocmd BufNewFile *.html 0r ~/.vim/templates/index.html
   augroup END
 endif
 
