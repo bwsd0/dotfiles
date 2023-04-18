@@ -4,10 +4,10 @@
     signingKey = KEY
 
 [sendemail]
-	smtpserver = smtp.gmail.com
-	smtpuser = GIT_AUTHOR_EMAIL
-	smtpencryption = tls
-	smtpserverport = 587
+  smtpserver = GIT_SMTP_SERVER
+  smtpuser = GIT_AUTHOR_EMAIL
+  smtpencryption = GIT_SMTP_ENCRYPTION
+  smtpserverport = GIT_SMTP_SERVER_PORT
 
 [core]
     editor = EDITOR
@@ -19,6 +19,9 @@
     excludesfile = ~/.gitignore_global
     attributesfile = ~/.gitattributes
     hooksPath = ~/dotfiles/git/templates/hooks
+
+[init]
+  defaultBranch = main
 
 [grep]
     lineNumber = true
