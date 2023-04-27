@@ -64,5 +64,16 @@ for file in $(modified_files); do
 	check_filesize "$file"
 done
 
+check_leaks() {
+	# zricethezav/gitleaks:v8.16.0
+	GITLEAKS_VERSION="${GITLEAKS_VERSION:-sha256:3a96a8a11de886924ff87fe6295ca89535959fe0ac7d416adbbf0006b2b42f31}"
+	if command docker -v >/dev/null 2>&1
+  then
+		docker run -v "$(pwd)":/root/ zricethezav/gitleaks@"${GITLEAKS_VERSION}" \
+      -f sarif -l warn --no-banner protect --source=/root --redact --staged -v
+	fi
+}
+check_leaks
+
 # abort the commit if there are whitespace errors in staged files
 exec git diff-index --check --cached "$SHA" --

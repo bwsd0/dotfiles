@@ -18,7 +18,7 @@
     precomposeUnicode = true
     excludesfile = ~/.gitignore_global
     attributesfile = ~/.gitattributes
-    hooksPath = ~/dotfiles/git/templates/hooks
+    hooksPath = ~/b/dotfiles/git/templates/hooks
 
 [init]
   defaultBranch = main
