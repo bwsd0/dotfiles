@@ -14,8 +14,7 @@ CHMOD	:= chmod
 SED 	:= sed
 M4		:= m4
 
-SHELLCHECKOPTS=$(addprefix -e, SC1091 SC1117)
-
+export SHELLCHECK_OPTS='-fgcc --exclude=SC1090,SC1117'
 cmd_install_one = \
 				  $(Q)$(kecho) '  INSTALL	$<'; \
 				  $(INSTALL)
@@ -205,7 +204,7 @@ $(DESTDIR)/.my.cnf: mysql/.my.cnf
 
 .PHONY: test
 test: ## run shellcheck tests on scripts
-	./test.sh $(SHELLCHECKOPTS)
+	@./test.sh $(SHELLCHECKOPTS)
 
 .PHONY: install
 install: $(TARGETS)

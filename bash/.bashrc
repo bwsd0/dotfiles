@@ -26,72 +26,31 @@ HISTIGNORE="&:bg:fg:ls:history:cd -:pwd:exit:date:* --help:* -h:* -v:make*"
 # include timestamps of commands in history
 HISTTIMEFORMAT='%F %T  '
 
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# on history expansion failure retry the command
-shopt -s histreedit
-
-# check the window size after invoking commands and update the values of
-# LINES,COLUNS
-shopt -s checkwinsize
-
-# use single history entry for multi-line commands
-shopt -s cmdhist
-
-# enable extended globbing: !(foo), ?(bar|baz)...
-shopt -s extglob
-
-if ((BASH_VERSINFO[0] >= 4)) ; then
-	# tolerate minor directory name errors during completion
-	shopt -s dirspell
-    # If set, the pattern "**" used in a pathname expansion context will match
-    # all files and zero or more directories and subdirectories
-	shopt -s globstar
-fi
-
-# correct spelling errors in `cd` directory component
+# Output shell errors in GNU error format.
+#
+# See: https://www.gnu.org/prep/standards/html_node/Errors.html for an
+# explanation of all options.
+shopt -s cdable_vars
 shopt -s cdspell
-
-# include dotfiles in pattern matching
+shopt -s checkwinsize
+shopt -s cmdhist
+shopt -s direxpand
+shopt -s dirspell
 shopt -s dotglob
-
-# use case-insensitive filename matching when performing pathname expansion
-shopt -s nocaseglob
-
-# do not offer completions for empty input on tab-press
+shopt -s extglob
+shopt -s globstar
+shopt -s gnu_errfmt
+shopt -s histappend
+shopt -s histreedit
+shopt -s hostcomplete
 shopt -s no_empty_cmd_completion
-
-# use programmable completion if available
+shopt -s nocaseglob
 shopt -s progcomp
-
-# exclude search of $PATH for locating files with `source` builtin
 shopt -u sourcepath
 
-# hostname completion
-shopt -s hostcomplete
-
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && export LESSOPEN="|lesspipe %s"
-
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" \
-        || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-	alias dir='dir --color=auto'
-	alias vdir='vdir --color=auto'
-
-	alias grep='grep --color=auto'
-	alias fgrep='fgrep --color=auto'
-	alias egrep='egrep --color=auto'
-fi
-
-if [ -f /etc/bash_completion ]; then
-	source /etc/bash_completion
-fi
-
+# shellcheck disable=SC2155
 export GPG_TTY="$(tty)"
+# shellcheck disable=SC2155
 export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
 gpgconf --launch gpg-agent
 
@@ -99,10 +58,15 @@ if [[ "$UID" -ne 0 ]]; then
 	PS1="\[\033[31m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\W\[\033[m\]\$ "
 fi
 
+if [ -f /etc/bash_completion ]; then
+  # shellcheck disable=SC1091
+	source /etc/bash_completion
+fi
 # source supplementary aliases definitions, functions and PATH
 for file in ~/.{bash_aliases,functions,path,env,bash_prompt}; do
 	if [[ -r "$file" ]] && [[ -f "$file" ]]; then
 		source "$file"
 	fi
 done
+
 unset -v file

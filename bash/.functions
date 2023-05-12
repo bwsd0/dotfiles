@@ -50,24 +50,34 @@ rev-dns() {
 	dig -x "$1" +short
 }
 
-# shortcut to cd to project directory in GOPATH
-cdgo() {
-	local d=$1
+cds() {
+  cd "$@" 2> /dev/null
+  if [[ "$?" -eq 0 ]]; then
+    return 0
+  fi
 
-	if [[ -z "$d" ]]; then
-		printf "cdgo: missing go project name\\n" 1>&2; return 1
-	fi
+  # expand search from $(pwd) first
+  subdirs="$(find "$(pwd)" -type d -name "$d" -print -exec test -d '{}' \;)"
 
-	local srcroot=${GOPATH}/src/github.com/bwasd
-	mapfile -t godirs < <(find "$srcroot" \
-		\( -type d -name "$d" -print \
-		-exec test -d '{}'/.git \; \)| \
-		sort -u)
+	if [ "${subdirs[0]}" == "" ] || [ "${subdirs[*]}" == "" ]; then
+	  local srcroot="$HOME"
+    local d="$1"
+    if [[ -z "$d" ]]; then
+      printf "cd: missing name\\n" 1>&2; return 1
+    fi
 
-	if [ "${godirs[0]}" == "" ] || [ "${godirs[*]}" == "" ]; then
-		printf "cdgo: %s: no such go project\\n" "$d" 1>&2; return 1
-	fi
+    mapfile -t repo_dirs < <(find "$srcroot" \
+      \( -type d -name "$d" -print \
+      -exec test -d '{}'/.git \; \)| \
+      sort -u)
 
-	# cd to the first matched path
-	cd "${godirs[0]}" || return 0
+    if [ "${repo_dirs[0]}" == "" ] || [ "${repo_dirs[*]}" == "" ]; then
+      printf "cd: %s: no such project\\n" "$d" 1>&2; return 1
+    fi
+
+    # cd to the first matched path
+    cd "${repo_dirs[0]}" || return 0
+  else
+    cd "${subdirs[0]}" || return 0
+  fi
 }

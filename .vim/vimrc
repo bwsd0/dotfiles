@@ -56,8 +56,9 @@ set nonumber
 set colorcolumn=80
 
 set lines=50
-
-set columns=79
+" set columns=79
+set textwidth=0
+set nolist
 
 " command history to keep
 set history=10000
@@ -98,7 +99,7 @@ set timeoutlen=1000
 " chdir to the buffer in use
 set autochdir
 
-set mouse=
+set mouse=v
 
 set linebreak
 " save on buffer switch
@@ -108,6 +109,7 @@ set spelllang=en_us
 set dictionary^=/usr/share/dict/words
 nnoremap <leader>s
       \ :set spell!<CR>
+set spellcapcheck=
 
 " line break when char >80
 set textwidth=80
@@ -150,11 +152,11 @@ set autoindent
 " uses spaces instead of tabs
 set expandtab
 " indent using four spaces when using indent operation
-set shiftwidth=4
+set shiftwidth=2
 " indent intelligently but use 'tabstop' everywhere else
 set smarttab
 " spaces to show for a literal tab when 'list' is unset
-set tabstop=4
+set tabstop=2
 
 function! GitBranch()
   return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
@@ -193,17 +195,20 @@ execute 'set softtabstop='
             \ . &shiftwidth
 
 au BufNewFile,BufRead *.txt setlocal noet ts=4 sw=4
-au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet ts=4 sw=4
+au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet ts=2 sw=2
 au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=2 sw=2
 au BufNewFile,BufRead *.json setlocal expandtab ts=2 sw=2
 au BufNewFile,BufRead *.go set filetype=go
 au BufNewFile,BufRead *.msmtprc set filetype=msmtp
 au BufNewfile,BufRead *.tex set filetype=tex
 au BufNewFile,BufRead *.py set filetype=python
+au BufNewFile,BufRead muttrc,neomuttrc set filetype=muttrc
+au BufNewFile,BufRead *.mbsyncrc set filetype=mbsync
 
+autocmd FileType yml,yaml setlocal syntax=yaml
 autocmd FileType msmtp setlocal syntax=msmtp
+autocmd FileType mbsync setlocal syntax=mbsync
 autocmd FileType fstab,systemd set noexpandtab
-autocmd FileType sh set noexpandtab
 autocmd FileType gitcommit setlocal spell
 autocmd FileType APKBUILD setlocal filetype=sh
 autocmd FileType go setlocal syntax=go
@@ -218,6 +223,8 @@ autocmd Filetype tf setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
 
 " javascript
 autocmd Filetype js setlocal expandtab shiftwidth=2 tabstop=2
+
+autocmd Filetype sh setlocal expandtab shiftwidth=2 tabstop=2
 
 " search
 
@@ -238,7 +245,7 @@ set lazyredraw
 set mat=2
 
 " Maximum number of columns per line that syntax highlighting will match
-set synmaxcol=120
+set synmaxcol=512
 
 " paths where tags may be located
 set tags=./tags.tags;$HOME

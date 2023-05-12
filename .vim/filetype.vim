@@ -240,8 +240,11 @@ augroup filetypedetect
   " Mail messages
   autocmd BufNewFile,BufRead
         \ ?*.msg
-        \,mutt-*-[0-9]\+-[0-9]\+-[0-9]\+
-        \ setfiletype mail
+        \,[neo]*mutt-*-[0-9]\+-[0-9]\+-[0-9]\+
+        \,setfiletype mail
+        \,set tw=72
+        \,setl comments+=nb:>
+        \,match ErrorMsg '\s\+$'
 
   " Mail messages
   autocmd BufNewFile,BufRead

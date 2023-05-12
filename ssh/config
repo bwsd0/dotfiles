@@ -1,3 +1,9 @@
-Match host * exec "gpg-connect-agent updatestartuptty /bye"
-AddKeysToAgent yes
-FingerprintHash sha256
+IdentityFile ~/.ssh/id_rsa_github.pub
+
+Host github.com
+  User git
+  IdentitiesOnly yes
+
+Host gitlab.com
+  User git
+  IdentitiesOnly yes
