@@ -7,4 +7,10 @@ git diff --cached --name-only --diff-filter=ACM HEAD |
 	xargs file |
 	grep -E "POSIX shell|Bourne-Again shell script|*bash*" - |
 	cut -d ':' -f1 |
-	xargs shellcheck "$SHELLCHECK_OPTS" -f gcc
+	xargs shellcheck -x "$SHELLCHECK_OPTS" -f gcc
+
+(
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf -- "$tmpdir"' EXIT
+  make install DESTDIR="$tmpdir"
+)

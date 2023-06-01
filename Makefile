@@ -14,7 +14,6 @@ CHMOD	:= chmod
 SED 	:= sed
 M4		:= m4
 
-export SHELLCHECK_OPTS='-fgcc --exclude=SC1090,SC1117'
 cmd_install_one = \
 				  $(Q)$(kecho) '  INSTALL	$<'; \
 				  $(INSTALL)
@@ -149,9 +148,7 @@ VIM_SRCS = after/indent/gitconfig.vim \
 	ftdetect/mine.vim \
 	scripts.vim \
 	syntax/msmtp.vim \
-	system.vim \
-	templates/shell.sh \
-	templates/README.md
+	system.vim
 
 VIM_SRCS := $(addprefix $(VIMDIR)/, $(VIM_SRCS))
 VIM_SRCS += $(VIMRC)
@@ -204,7 +201,7 @@ $(DESTDIR)/.my.cnf: mysql/.my.cnf
 
 .PHONY: test
 test: ## run shellcheck tests on scripts
-	@./test.sh $(SHELLCHECKOPTS)
+	@./test.sh
 
 .PHONY: install
 install: $(TARGETS)
