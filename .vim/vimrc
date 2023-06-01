@@ -57,7 +57,7 @@ set colorcolumn=80
 
 set lines=50
 " set columns=79
-set textwidth=0
+set textwidth=79
 set nolist
 
 " command history to keep
@@ -120,14 +120,19 @@ vmap <C-x> "+c
 vmap <C-v> c<ESC>"+p
 imap <C-v> <ESC>"+pa
 
+" Automatically enable paste mode when pasting
+set pastetoggle=<F11>
+
 set complete=.,w,b,u,t
 
 set completeopt=longest,menuone
 
 set backspace=indent,eol,start
 
+set formatoptions+=n
 set formatoptions+=l
-
+set formatoptions-=t
+set breakat=\ \\t\\=\\-\\_\\[\\{\\}\\|\\,\\.\\;\\:\'\\\"\\)\\]\\s\\$
 set listchars=eol:$,tab:>-,trail:-,nbsp:+
 
 if has('unix')
@@ -194,10 +199,10 @@ set statusline+=\ %l:%c
 execute 'set softtabstop='
             \ . &shiftwidth
 
-au BufNewFile,BufRead *.txt setlocal noet ts=4 sw=4
-au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet ts=2 sw=2
-au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=2 sw=2
-au BufNewFile,BufRead *.json setlocal expandtab ts=2 sw=2
+au BufNewFile,BufRead *.txt setlocal noet ts=8 sw=4
+au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet ts=4 sw=4
+au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=4 sw=4
+au BufNewFile,BufRead *.json setlocal expandtab ts=4 sw=4
 au BufNewFile,BufRead *.go set filetype=go
 au BufNewFile,BufRead *.msmtprc set filetype=msmtp
 au BufNewfile,BufRead *.tex set filetype=tex
@@ -215,15 +220,13 @@ autocmd FileType go setlocal syntax=go
 autocmd FileType tex setlocal syntax=tex
 
 autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4
-" c
-autocmd FileType c setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
-
-" terraform
+" Linux kernel
+" autocmd FileType c setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
+" Plan 9 kernel
+" autocmd FileType c setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
+autocmd FileType c setlocal noexpandtab shiftwidth=4 softtabstop=4 tabstop=4
 autocmd Filetype tf setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
-
-" javascript
 autocmd Filetype js setlocal expandtab shiftwidth=2 tabstop=2
-
 autocmd Filetype sh setlocal expandtab shiftwidth=2 tabstop=2
 
 " search
@@ -261,6 +264,7 @@ nnoremap : ;
 vnoremap ; :
 vnoremap : ;
 
+" Maps the spacebar key in normal mode to clear the search highlighting.
 nnoremap <silent> <Space> :nohlsearch<CR>
 
 " Toggle spell checking
