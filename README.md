@@ -1,6 +1,6 @@
 # dotfiles
 
-This repository contains personal settings, scripts, for user's a `home/`
+This repository contains personal settings and scripts for user's a `home/`
 directory.
 
 ## Installation
