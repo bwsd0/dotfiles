@@ -1,12 +1,10 @@
-9front install notes for ThinkPad T60
+Supported Hardware
+------------------
 
-wget -O - http://9front.org/iso/9front-7408.1d345066125a.386.iso.gz \
-	| gunzip -c > plan9.386.iso
-mkdir $dir
-cp mbr pbs 9bootfat 9pc plan9.ini plan9.386.iso $dir
-makebootfat -m $dir/mbr -b $dir/pbs -o /dev/sdX $dir
+Hardware configurations known to support Plan 9 (9front) after testing.
 
-Hardware
+ThinkPad T60
+------------
 
 Product Name: 2007F4G
 Version: ThinkPad T60
@@ -52,6 +50,10 @@ PRO/Wireless 3945ABG [Golan] Network Connection
 	FRU: 41W1029
 
 Notes
+=====
 
 Intel PRO Wireless 3945abg PCI/PCI-Express wireless adapter firmware:
 http://firmware.openbsd.org/firmware/*/wpi-firmware*.tgz
+
+BeagleBone Black (Rev C)
+------------------------
