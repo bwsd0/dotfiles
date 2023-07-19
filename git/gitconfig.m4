@@ -57,6 +57,9 @@
 [branch]
     autoSetupRebase = always
 
+[pull]
+    rebase = true
+
 [commit]
     gpgsign = false
 
