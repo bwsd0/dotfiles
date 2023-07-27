@@ -1,11 +1,12 @@
 # dotfiles
 
-This repository contains personal settings and scripts for user's a `home/`
+This repository contains personal settings and scripts for a user's `home/`
 directory.
 
 ## Installation
 
 ```sh
+apt-get install build-essential m4
 make install
 ```
 
