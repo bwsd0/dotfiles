@@ -17,5 +17,5 @@ echo "$modified" |
 (
   tmpdir="$(mktemp -d)"
   trap 'rm -rf -- "$tmpdir"' EXIT
-  make install DESTDIR="$tmpdir"
+  make install DESTDIR="$tmpdir" 1> /dev/null
 )
