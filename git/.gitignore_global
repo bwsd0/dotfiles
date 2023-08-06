@@ -1,3 +1,14 @@
+*
+!*.*
+!/**/
+
+!configure
+!Dockerfile*
+!LICENSE
+!Makefile*
+!mk*
+!README
+
 *~
 *.a
 *.bin
@@ -5,6 +16,8 @@
 *.c.[012]*.*
 *.diff
 .directory
+*.dll
+*.doc[x]*
 .DS_Store
 *.dSYM/
 *.dylib
