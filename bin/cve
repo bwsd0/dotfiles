@@ -1,0 +1,5 @@
+#!/bin/sh
+
+if echo "$1" | grep -qEo "^CVE-[0-9]{4}-[0-9]{4,19}$" ; then
+  web "https://www.cvedetails.com/cve/$1/"
+fi

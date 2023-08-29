@@ -1,0 +1,19 @@
+#!/bin/sh
+# watch files and execute them when they change
+#
+# Usage: bwatch <FILE...>
+
+while true; do
+	now=
+	stat="$(stat --format=%Y.%Z.%s "$1")"
+	if [ "$stat" != "${laststat:-$stat}" ]; then
+		laststat=$stat
+		now=yes
+	fi
+
+  if [ -n "$now" ]; then
+    "$@"
+  fi
+	laststat="$stat"
+	sleep 1
+done
