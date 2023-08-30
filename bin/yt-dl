@@ -1,0 +1,2 @@
+#!/bin/sh
+youtube-dl --no-color -q -x --audio-format best "$1"
