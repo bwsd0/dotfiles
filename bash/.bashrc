@@ -12,16 +12,16 @@ mesg n
 
 # unset -f command_not_found_handle
 
-# number of commands to remember in command history (2^12 = 4096)
-HISTSIZE=$((1 << 12))
+# number of commands to remember in command history
+HISTSIZE=8192 #$((1 << 13))
 
-# maximum number of lines contained in history file (2^24 = ~16 million)
-HISTFILESIZE=$((1 << 24))
+# maximum number of lines contained in history file
+HISTFILESIZE=$((1 << 18))
 
 # ignore duplicate commands and whitespace in history
 HISTCONTROL=ignoredups
 
-HISTIGNORE="&:bg:fg:ls:history:cd -:pwd:exit:date:* --help:* -h:* -v:make*"
+#HISTIGNORE="&:bg:fg:ls:history:cd -:pwd:exit:date:* --help:*"
 
 # include timestamps of commands in history
 HISTTIMEFORMAT='%F %T  '
@@ -59,8 +59,9 @@ if [[ "$UID" -ne 0 ]]; then
 fi
 
 if [ -f /etc/bash_completion ]; then
-  # shellcheck disable=SC1091
 	source /etc/bash_completion
+  test "$(command terraform -v > /dev/null 2>&1)"
+    complete -C /usr/bin/terraform terraform
 fi
 # source supplementary aliases definitions, functions and PATH
 for file in ~/.{bash_aliases,functions,path,env,bash_prompt}; do
@@ -70,3 +71,6 @@ for file in ~/.{bash_aliases,functions,path,env,bash_prompt}; do
 done
 
 unset -v file
+u="$(whoami)"
+sudo mkdir -p "$NAMESPACE"
+sudo chown -R "$u":"$u" "$NAMESPACE"
