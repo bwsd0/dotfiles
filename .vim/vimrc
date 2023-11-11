@@ -199,9 +199,9 @@ set statusline+=\ %l:%c
 execute 'set softtabstop='
             \ . &shiftwidth
 
-au BufNewFile,BufRead *.txt setlocal noet ts=8 sw=4
-au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet ts=4 sw=4
-au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=4 sw=4
+au BufNewFile,BufRead *.txt setlocal noet tw=69 ts=4 sw=4
+au BufNewFile,BufRead *.md,*.markdown,README setlocal spell noet tw=69 ts=4 sw=4
+au BufNewFile,BufRead *.yml,*.yaml setlocal expandtab ts=2 sw=2
 au BufNewFile,BufRead *.json setlocal expandtab ts=4 sw=4
 au BufNewFile,BufRead *.go set filetype=go
 au BufNewFile,BufRead *.msmtprc set filetype=msmtp
@@ -223,8 +223,8 @@ autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4
 " Linux kernel
 " autocmd FileType c setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
 " Plan 9 kernel
-" autocmd FileType c setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
-autocmd FileType c setlocal noexpandtab shiftwidth=4 softtabstop=4 tabstop=4
+autocmd FileType c setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
+" autocmd FileType c setlocal noexpandtab shiftwidth=4 softtabstop=4 tabstop=4
 autocmd Filetype tf setlocal noexpandtab shiftwidth=2 softtabstop=2 tabstop=2
 autocmd Filetype js setlocal expandtab shiftwidth=2 tabstop=2
 autocmd Filetype sh setlocal expandtab shiftwidth=2 tabstop=2
