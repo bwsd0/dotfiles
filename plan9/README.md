@@ -1,7 +1,7 @@
-Supported Hardware
-------------------
+Plan 9: Supported Hardware
+--------------------------
 
-Hardware configurations known to support Plan 9 (9front) after testing.
+Supported hardware configurations for Plan 9 (9front).
 
 ThinkPad T60
 ------------
@@ -43,7 +43,7 @@ VGA compatible controller
 	Product: RV515/M52 [Mobility Radeon X1300]
 	Vendor: Advanced Micro Devices, Inc. [AMD/ATI]
 
-PRO/Wireless 3945ABG [Golan] Network Connection
+PRO/Wireless 3945ABG [Golan] Network Connection[^1]
 	Vendor: Intel Corporation
 	Model: WM3945ABG MOW2
 	EC: G33188
@@ -52,8 +52,10 @@ PRO/Wireless 3945ABG [Golan] Network Connection
 Notes
 =====
 
-Intel PRO Wireless 3945abg PCI/PCI-Express wireless adapter firmware:
-http://firmware.openbsd.org/firmware/*/wpi-firmware*.tgz
+[^1]: Intel PRO Wireless 3945abg PCI/PCI-Express wireless adapter firmware:
+  http://firmware.openbsd.org/firmware/*/wpi-firmware*.tgz
 
 BeagleBone Black (Rev C)
 ------------------------
+
+TODO

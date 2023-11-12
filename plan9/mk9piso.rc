@@ -20,11 +20,9 @@ switch ($1) {
     exits "unsupported architecture"
 }
 
-build=0e66f87316e571f7edf5274369ec69a5905507aa
-n=9442
-
+n=9931
 fn dl {
-  iso=9front-$n.$build.$arch.iso.gz
+  iso=9front-$n.$arch.iso.gz
   mkdir $arch
   wget -O - https://9front.org/iso/$iso | gunzip -c > $arch/plan9.$arch.iso
 }
@@ -43,4 +41,4 @@ bootfile=9pc
 audio=hda
 EOF
 
-echo dd if=$arch of=$arch /dev/sdX
+echo dd if=$arch/plan9.$arch.iso of=/dev/sdX
