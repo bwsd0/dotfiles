@@ -94,7 +94,7 @@ set visualbell t_vb=
 
 " timeout after 1000ms between key events
 set timeout
-set timeoutlen=1000
+set timeoutlen=500
 
 " chdir to the buffer in use
 set autochdir
@@ -174,7 +174,7 @@ endfunction
 
 set statusline+=%#PmenuSel#
 " Display branch name if the working directory is in a git repository
-set statusline+=%{StatuslineGit()}
+" set statusline+=%{StatuslineGit()}
 set statusline+=%#LineNr#
 " Display fullpath to file in the buffer
 set statusline+=\ %F
@@ -243,6 +243,9 @@ set incsearch
 
 " don't redraw screen during execution of macros and scripts
 set lazyredraw
+
+" Clear the screen before redrawing
+set t_ti= t_te=
 
 " ms delay before showing match
 set mat=2
