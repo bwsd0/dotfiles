@@ -71,6 +71,3 @@ for file in ~/.{bash_aliases,functions,path,env,bash_prompt}; do
 done
 
 unset -v file
-u="$(whoami)"
-sudo mkdir -p "$NAMESPACE"
-sudo chown -R "$u":"$u" "$NAMESPACE"
