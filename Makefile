@@ -9,18 +9,18 @@ DESTDIR ?= $(HOME)
 prefix ?= $(HOME)
 bindir ?= $(prefix)/.local/bin
 
-INSTALL = install
+INSTALL = install -C
 CHMOD	:= chmod
 SED 	:= sed
 M4		:= m4
 
+# TODO: only print if the destination file was modified
 cmd_install_one = \
 				  $(Q)$(kecho) '  INSTALL	$<'; \
 				  $(INSTALL)
 cmd_install_many = \
 				   $(kecho) '  INSTALL	'"$$i"; \
 				   $(INSTALL)
-
 
 GENERATED_FILES = git/.gitconfig
 
@@ -29,12 +29,10 @@ TARGETS = install-bin \
 		  install-ssh \
 		  install-git \
 		  install-gnupg \
-		  install-x \
 		  install-tmux \
 		  install-psqlrc \
 		  install-mycnf \
-		  install-vim \
-		  install-lesskey
+		  install-vim
 
 .PHONY: all test default
 
@@ -43,47 +41,16 @@ TARGETS = install-bin \
 default: $(GENERATED_FILES)
 all: $(TARGETS)
 
-.PHONY: .gitconfig
-git/.gitconfig: git/gitconfig.m4
-	$(Q)$(kecho) '  GEN		$@';
+.PHONY: configure
+configure: git/gitconfig.m4
+	@./scripts/mkconfig.sh
+	$(Q)$(kecho) '  GEN		$<';
 	$(Q)$(M4) \
-		-D GIT_AUTHOR_NAME=$(NAME) \
-		-D GIT_AUTHOR_EMAIL=$(GIT_AUTHOR_EMAIL) \
-		-D GIT_SMTP_SERVER=$(GIT_SMTP_SERVER) \
-		-D GIT_SMTP_ENCRYPTION=$(GIT_SMTP_ENCRYPTION) \
-		-D GIT_SMTP_SERVER_PORT=$(GIT_SMTP_SERVER_PORT) \
-		-D EDITOR=$(EDITOR) \
-		-D KEY=$(KEY) \
-		$< > $@
-
-.PHONY: .msmtprc
-msmtp/.msmtprc: msmtp/msmtprc.m4
-	$(Q)$(kecho) '  GEN		$@';
-	$(Q)$(M4) \
-		-D EMAIL=$(EMAIL) \
-		-D PASSCMD=$(PASSCMD) \
-	$< > $@
-
-.PHONY: muttrc
-mutt/muttrc: mutt/muttrc.m4
-	$(Q)$(kecho) '  GEN		$@';
-	$(Q)$(M4) \
-		-D SENDMAIL=$(SENDMAIL) \
 		-D NAME=$(NAME) \
 		-D EMAIL=$(EMAIL) \
 		-D EDITOR=$(EDITOR) \
-		-D MAILDIR=$(MAILDIR) \
-		$< > $@
-
-.PHONY: .mbsyncrc
-mbsync/.mbsyncrc: mbsync/mbsyncrc.m4 ## generate mbsyncrc
-	$(Q)$(kecho) '  GEN		$@';
-	$(Q)$(M4) \
-		-D USER=$(USER) \
-		-D MAILDIR=$(MAILDIR) \
-		-D EMAIL=$(EMAIL) \
-		-D PASSCMD=$(PASSCMD) \
-		$< > $@
+		-D KEY=$(KEY) \
+		$< > git/gitconfig
 
 BASH_RCS = $(addprefix bash/,.bashrc \
 	.bash_profile \
@@ -115,15 +82,9 @@ install-git: $(GIT_FILES)  ## install global git options
 		$(call cmd_install_many) -D -m 644 $$i $(DESTDIR); \
 	done
 
-.PHONY: install-lesskey
-install-lesskey: $(DESTDIR)/.lesskey ## install less-key(1) bindings file
-$(DESTDIR)/.lesskey: less/.lesskey
-	$(call cmd_install_one) -m 644 $< $@
-	$(Q)lesskey
-
 .PHONY: install-bin
-install-bin: $(bindir) ## install user scripts
-	$(Q)mkdir -p -- $@
+install-bin: ## install user scripts
+	$(Q)mkdir -p $(bindir)
 	$(Q)for b in $(shell find ./bin -type f); do \
 		install -m 744 $$b $(bindir); \
 	done
@@ -184,10 +145,6 @@ install-mutt: $(MUTT_RCS) ## install mutt configuration
 install-tmux: $(DESTDIR)/.tmux.conf ## install tmux.conf
 $(DESTDIR)/.tmux.conf: tmux/.tmux.conf
 	$(call cmd_install_one) -m 644 $< $@
-
-.PHONY: install-x
-install-x: X/.Xresources X/.xinitrc ## install X
-	$(call cmd_install_one) -m 644 $^ $(DESTDIR)
 
 .PHONY: install-psqlrc
 install-psqlrc: $(DESTDIR)/.psqlrc ## install psqlrc

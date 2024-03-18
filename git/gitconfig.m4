@@ -1,13 +1,7 @@
 [user]
-    name = GIT_AUTHOR_NAME
-    email = GIT_AUTHOR_EMAIL
+    name = NAME
+    email = EMAIL
     signingKey = KEY
-
-[sendemail]
-  smtpserver = GIT_SMTP_SERVER
-  smtpuser = GIT_AUTHOR_EMAIL
-  smtpencryption = GIT_SMTP_ENCRYPTION
-  smtpserverport = GIT_SMTP_SERVER_PORT
 
 [core]
     editor = EDITOR
@@ -18,7 +12,7 @@
     precomposeUnicode = true
     excludesfile = ~/.gitignore_global
     attributesfile = ~/.gitattributes
-    hooksPath = ~/b/dotfiles/git/templates/hooks
+    hooksPath = ~/dotfiles/git/templates/hooks
 
 [init]
   defaultBranch = main

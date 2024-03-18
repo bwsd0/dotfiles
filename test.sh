@@ -10,7 +10,7 @@ fi
 echo "$modified" |
   sort -u  |
   xargs file |
-  grep -E "POSIX shell|Bourne-Again shell script|*bash*" - |
+  grep -E "POSIX shell|Bourne-Again shell script" - |
   cut -d ':' -f1 |
   xargs shellcheck -x "$SHELLCHECK_OPTS" -f gcc
 

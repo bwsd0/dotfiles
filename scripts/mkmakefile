@@ -1,6 +1,0 @@
-#!/bin/sh
-
-echo "  GEN     Makefile"
-cat << EOF > Makefile
-include $(realpath $1/Makefile)
-EOF
