@@ -55,7 +55,6 @@ set nonumber
 
 set colorcolumn=80
 
-set lines=50
 " set columns=79
 set textwidth=79
 set nolist
