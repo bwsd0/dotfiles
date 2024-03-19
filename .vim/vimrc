@@ -337,10 +337,6 @@ if has('autocmd')
           \	exe "normal! g`\"" |
           \ endif
   augroup END
-  augroup templates
-    autocmd BufNewFile *.[sh|bash] 0r ~/.vim/templates/shell.sh
-    autocmd BufNewFile [README]*.[md|markdown] 0r ~/.vim/templates/README.md
-  augroup END
 endif
 
 " use vim session as manpager

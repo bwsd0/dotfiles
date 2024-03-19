@@ -32,3 +32,13 @@ git clone https://github.com/vim/vim.git
 	--with-x
  make && sudo make install
  ```
+
+ ## Install and configure plugins
+
+```bash
+mkdir -p ~/.vim/pack/plugins/start
+git clone --depth 1 https://github.com/dense-analysis/ale.git ~/.vim/pack/plugins/start/ale
+git clone --depth 1 https://github.com/fatih/vim-go.git ~/.vim/pack/plugins/start/vim-go
+```
+
+Run `:GoInstallBinaries` to install [vim-go](https://github.com/fatih/vim-go) binaries.
