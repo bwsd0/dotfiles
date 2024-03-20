@@ -1,2 +1,6 @@
 #!/bin/sh
-youtube-dl --no-color -q -x --audio-format best "$1"
+if command -v yt-dlp >/dev/null 2>&1; then
+ yt-dlp --no-color -q -x --audio-format best "$1"
+else
+  echo "yt-dlp is not installed"
+fi
