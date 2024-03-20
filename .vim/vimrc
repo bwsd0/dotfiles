@@ -45,15 +45,9 @@ set wildignore=*~,*.7z,.DS_Store,.git,.hg,.svn,*.a,*.avi,*.bin,*.bmp,*.bz2
 
 set wildignore+=*node_modules/**
 
-if exists('+cursorline')
-  if exists('g:colors_name')
-    set cursorline
-  endif
-endif
-
 set nonumber
 
-set colorcolumn=80
+set colorcolumn=
 
 " set columns=79
 set textwidth=79
