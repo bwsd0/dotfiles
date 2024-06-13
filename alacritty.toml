@@ -1,0 +1,80 @@
+live_config_reload = true
+
+[colors]
+  draw_bold_text_with_bright_colors = true
+
+[window]
+startup_mode = "Maximized"
+dynamic_title = true
+
+  [window.dimensions]
+  columns = 80
+  lines = 25
+
+[font]
+size = 12
+builtin_box_drawing = true
+
+  [font.normal]
+  family = "inconsolata"
+  style = "Regular"
+
+  [font.bold]
+  family = "inconsolata"
+  style = "Bold"
+
+  [font.italic]
+  family = "inconsolata"
+  style = "Italic"
+
+  [font.bold_italic]
+  family = "inconsolata"
+  style = "Bold Italic"
+
+  [font.offset]
+  x = 0
+  y = 0
+
+  [font.glyph_offset]
+  x = 0
+  y = 0
+
+[colors.primary]
+background = "0x0a0c10"
+foreground = "0xf0f3f6"
+
+[colors.cursor]
+text = "0x0a0c10"
+cursor = "0xf0f3f6"
+
+[colors.normal]
+black = "0x7a828e"
+red = "0xff9492"
+green = "0x26cd4d"
+yellow = "0xf0b72f"
+blue = "0x71b7ff"
+magenta = "0xcb9eff"
+cyan = "0x39c5cf"
+white = "0xd9dee3"
+
+[colors.bright]
+black = "0x9ea7b3"
+red = "0xffb1af"
+green = "0x4ae168"
+yellow = "0xf7c843"
+blue = "0x91cbff"
+magenta = "0xcb9eff"
+cyan = "0x39c5cf"
+white = "0xd9dee3"
+
+[selection]
+save_to_clipboard = true
+
+[cursor]
+unfocused_hollow = true
+
+  [cursor.style]
+  shape = "Block"
+
+[shell]
+program = "/bin/bash"
