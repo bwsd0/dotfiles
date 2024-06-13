@@ -128,19 +128,6 @@ install-gnupg: $(GPG_FILES) ## install gnupg
 		$(call cmd_install_many) -D -m 600 $$i $(DESTDIR)/$(GNUPGHOME); \
 	done
 
-MUTT_RCS = mutt/muttrc \
-	mutt/mutt-dark-16.muttrc \
-	mutt/signature \
-	mutt/mailcap
-
-.PHONY: install-mutt
-install-mutt: $(MUTT_RCS) ## install mutt configuration
-	$(Q)mkdir -p -- $(DESTDIR)/.mutt \
-		$(DESTDIR)/.cache/mutt
-	$(Q)for i in $(MUTT_RCS); do \
-		$(call cmd_install_many) -D -m 644 $$i $(DESTDIR)/.mutt; \
-	done
-
 .PHONY: install-tmux
 install-tmux: $(DESTDIR)/.tmux.conf ## install tmux.conf
 $(DESTDIR)/.tmux.conf: tmux/.tmux.conf
