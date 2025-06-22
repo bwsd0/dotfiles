@@ -4,7 +4,7 @@
 
 [window]
 startup_mode = "Maximized"
-dynamic_title = true
+decorations = "none"
 
   [window.dimensions]
   columns = 80
