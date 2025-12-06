@@ -19,12 +19,6 @@ make && make install DESTDIR="$tmpdir"
 env -i HOME="$tmpdir" TERM="$TERM" "$SHELL" -l
 ```
 
-## Test
-
-```sh
-make test
-```
-
 ## License
 
 MIT
