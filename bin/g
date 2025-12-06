@@ -1,2 +1,0 @@
-#!/bin/env rc
-fn g { grep -n $* *.[chsylgo] /dev/null }

@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-godoc2man "$1" \
-	| 9 troff -N -man \
-	| 9 awk '/^$/ {if(n != 1) print; n=1; next} /./ {n=0; print}' \
-	| 9 col -x \
-	| less -X

@@ -1,4 +1,0 @@
-#!/bin/sh
-#
-# recursively search for git repositories under the given directory
-find "${1:-.}" -type d -name .git -exec cleanname {} \; | sed -e s,/.git$,,
