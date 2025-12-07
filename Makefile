@@ -70,13 +70,14 @@ install-bin: $(BIN_FILES) ## install user scripts
 	done
 
 # Vim runtime files
-VIM_FILES := $(shell find .vim -type f -name '*.vim') .vim/vimrc
+VIM_FILES := $(shell find vim -type f -name '*.vim') vim/vimrc
 
 install-vim: $(VIM_FILES) ## install vim runtime
 	$(Q)for f in $(VIM_FILES); do \
 		$(call msg,INSTALL,$$f); \
-		mkdir -p $(DESTDIR)/$$(dirname $$f); \
-		$(INSTALL) -m 644 $$f $(DESTDIR)/$$f; \
+		dest=".vim/$${f#vim/}"; \
+		mkdir -p $(DESTDIR)/$$(dirname $$dest); \
+		$(INSTALL) -m 644 $$f $(DESTDIR)/$$dest; \
 	done
 
 # GnuPG configuration
