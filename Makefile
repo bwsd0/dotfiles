@@ -42,7 +42,7 @@ BASH_FILES := .bashrc .bash_profile .bash_logout .bash_aliases .path .functions 
 
 install-bash: ## install bash files
 	$(Q)for f in $(BASH_FILES); do \
-		$(call msg,INSTALL,bash/$$f); \
+		echo "  INSTALL	bash/$$f"; \
 		$(INSTALL) -m 644 bash/$$f $(DESTDIR)/$$f; \
 	done
 
@@ -55,7 +55,7 @@ install-ssh: ssh/config ## install SSH config
 # Git configuration
 install-git: git/.gitconfig git/.gitignore_global ## install git config
 	$(Q)for f in $^; do \
-		$(call msg,INSTALL,$$f); \
+		echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 644 $$f $(DESTDIR)/$$(basename $$f); \
 	done
 
@@ -65,7 +65,7 @@ BIN_FILES := $(wildcard bin/*)
 install-bin: $(BIN_FILES) ## install user scripts
 	$(Q)mkdir -p $(bindir)
 	$(Q)for f in $^; do \
-		$(call msg,INSTALL,$$f); \
+		echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 755 $$f $(bindir); \
 	done
 
@@ -74,7 +74,7 @@ VIM_FILES := $(shell find vim -type f -name '*.vim') vim/vimrc
 
 install-vim: $(VIM_FILES) ## install vim runtime
 	$(Q)for f in $(VIM_FILES); do \
-		$(call msg,INSTALL,$$f); \
+		echo "  INSTALL	$$f"; \
 		dest=".vim/$${f#vim/}"; \
 		mkdir -p $(DESTDIR)/$$(dirname $$dest); \
 		$(INSTALL) -m 644 $$f $(DESTDIR)/$$dest; \
@@ -87,7 +87,7 @@ GPG_FILES := gnupg/gpg.conf gnupg/gpg-agent.conf
 install-gnupg: $(GPG_FILES) ## install gnupg config
 	$(Q)mkdir -p -m 0700 $(DESTDIR)/$(GNUPGHOME)
 	$(Q)for f in $^; do \
-		$(call msg,INSTALL,$$f); \
+		echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 600 $$f $(DESTDIR)/$(GNUPGHOME)/$$(basename $$f); \
 	done
 
