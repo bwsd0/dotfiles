@@ -1,5 +1,9 @@
 setlocal noexpandtab
-let b:undo_indent .= '|setlocal expandtab<'
+if !exists('b:undo_indent')
+  let b:undo_indent = 'setlocal expandtab<'
+else
+  let b:undo_indent .= '|setlocal expandtab<'
+endif
 if v:version > 703
       \ || v:version == 703 && has('patch629')
   setlocal shiftwidth=0

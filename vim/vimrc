@@ -7,12 +7,9 @@ if has('autocmd')
   filetype plugin indent on
 endif
 
-if !exists('$LANG')
-  set encoding=utf-8
-endif
 scriptencoding utf-8
 
-if has('multi_byte')
+if has('multi_byte') && !exists('$LANG')
   set encoding=utf-8
 endif
 
@@ -20,7 +17,7 @@ if isdirectory(expand("$HOME/.vim"))
   let $VIMDIR=expand("$HOME/.vim")
   execute 'set runtimepath^='. "$VIMDIR"
 elseif &runtimepath !=# ''
-  let $VIMDIR = split#Option(&runtimepath)[0]
+  let $VIMDIR = split(&runtimepath, ',')[0]
 endif
 
 set t_Co=256
@@ -48,16 +45,10 @@ set wildignore+=*node_modules/**
 set nonumber
 
 set colorcolumn=
-
-" set columns=79
-set textwidth=79
 set nolist
 
 " command history to keep
 set history=10000
-
-" number of screen lines to use for the command-line
-set cmdheight=1
 
 " show (partial) command in the last line of the screen
 set noshowcmd
@@ -67,8 +58,6 @@ set shortmess+=I
 
 set laststatus=2
 
-set linespace=2
-
 " show lines of context around the cursor
 set scrolloff=5
 
@@ -77,16 +66,11 @@ set showmatch
 
 set title
 
-" indicate fast terminal connection for smoother redrawing
-set ttyfast
-
 " disable visual bell
 set visualbell t_vb=
 
 " behaviour
 
-" timeout after 1000ms between key events
-set timeout
 set timeoutlen=500
 
 " chdir to the buffer in use
@@ -100,8 +84,6 @@ set autowrite
 
 set spelllang=en_us
 set dictionary^=/usr/share/dict/words
-nnoremap <leader>s
-      \ :set spell!<CR>
 set spellcapcheck=
 
 " line break when char >80
@@ -214,7 +196,7 @@ autocmd FileType APKBUILD setlocal filetype=sh
 autocmd FileType go setlocal syntax=go
 autocmd FileType tex setlocal syntax=tex
 
-autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4
+autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4 noautochdir
 " Linux kernel
 " autocmd FileType c setlocal noexpandtab shiftwidth=8 softtabstop=8 tabstop=8
 " Plan 9 kernel
@@ -238,9 +220,6 @@ set incsearch
 
 " don't redraw screen during execution of macros and scripts
 set lazyredraw
-
-" Clear the screen before redrawing
-set t_ti= t_te=
 
 " ms delay before showing match
 set mat=2
@@ -316,22 +295,19 @@ if has('persistent_undo')
   call map(s:undos, 'delete(v:val)')
 endif
 
-if has('autocmd')
-  filetype plugin indent on
-  augroup vimrcEx
-    au!
-    autocmd FileType text setlocal textwidth=79
+augroup vimrcEx
+  au!
+  autocmd FileType text setlocal textwidth=79
 
-    " When editing a file, always jump to the last known cursor position,
-    " except when:
-    " - the cursor position be invalid or inside an event handler
-    " - mark is the first line
-    autocmd BufReadPost *
-          \ if line("'\"") > 1 && line("'\"") <= line("$") |
-          \	exe "normal! g`\"" |
-          \ endif
-  augroup END
-endif
+  " When editing a file, always jump to the last known cursor position,
+  " except when:
+  " - the cursor position be invalid or inside an event handler
+  " - mark is the first line
+  autocmd BufReadPost *
+        \ if line("'\"") > 1 && line("'\"") <= line("$") |
+        \	exe "normal! g`\"" |
+        \ endif
+augroup END
 
 " use vim session as manpager
 runtime! ftplugin/man.vim

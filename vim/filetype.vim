@@ -241,10 +241,7 @@ augroup filetypedetect
   autocmd BufNewFile,BufRead
         \ ?*.msg
         \,[neo]*mutt-*-[0-9]\+-[0-9]\+-[0-9]\+
-        \,setfiletype mail
-        \,set tw=72
-        \,setl comments+=nb:>
-        \,match ErrorMsg '\s\+$'
+        \ setfiletype mail
 
   " Mail messages
   autocmd BufNewFile,BufRead
@@ -439,12 +436,12 @@ augroup filetypedetect
   autocmd BufNewFile,BufRead
         \ sudoers
         \,sudoers.tmp
-        \ setfiletype sshdconfig
+        \ setfiletype sudoers
 
   " OpenSSH server configuration
   autocmd BufNewFile,BufRead
         \ sshd_config
-        \ setfiletype sudoers
+        \ setfiletype sshdconfig
 
   " Subversion commit
   autocmd BufNewFile,BufRead
