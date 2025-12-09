@@ -21,7 +21,7 @@ man() {
 }
 
 gpg_tty() {
-	echo UPDATESTARTUPTTY | gpg-connect-agent
+	gpg-connect-agent updatestartuptty /bye
 }
 
 9man() {
@@ -51,32 +51,32 @@ rev-dns() {
 }
 
 cds() {
-  if cd "$@" 2> /dev/null; then
+  local d="$1"
+  if [[ -z "$d" ]]; then
+    printf "cds: missing name\\n" 1>&2
+    return 1
+  fi
+
+  if cd "$d" 2>/dev/null; then
     return 0
   fi
 
-  # expand search from $(pwd) first
-  subdirs="$(find "$(pwd)" -type d -name "$d" -print -exec test -d '{}' \;)"
-
-	if [ "${subdirs[0]}" == "" ] || [ "${subdirs[*]}" == "" ]; then
-	  local srcroot="$HOME"
-    local d="$1"
-    if [[ -z "$d" ]]; then
-      printf "cd: missing name\\n" 1>&2; return 1
-    fi
-
-    mapfile -t repo_dirs < <(find "$srcroot" \
-      \( -type d -name "$d" -print \
-      -exec test -d '{}'/.git \; \)| \
-      sort -u)
-
-    if [ "${repo_dirs[0]}" == "" ] || [ "${repo_dirs[*]}" == "" ]; then
-      printf "cd: %s: no such project\\n" "$d" 1>&2; return 1
-    fi
-
-    # cd to the first matched path
-    cd "${repo_dirs[0]}" || return 0
-  else
-    cd "${subdirs[0]}" || return 0
+  # search from current directory first
+  local subdir
+  subdir="$(find "$(pwd)" -maxdepth 3 -type d -name "$d" -print -quit 2>/dev/null)"
+  if [[ -n "$subdir" ]]; then
+    cd "$subdir" || return 1
+    return 0
   fi
+
+  # search for git repos in $HOME
+  local repo
+  repo="$(find "$HOME" -maxdepth 4 -type d -name "$d" -exec test -d '{}'/.git \; -print -quit 2>/dev/null)"
+  if [[ -n "$repo" ]]; then
+    cd "$repo" || return 1
+    return 0
+  fi
+
+  printf "cds: %s: not found\\n" "$d" 1>&2
+  return 1
 }

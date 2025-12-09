@@ -3,7 +3,6 @@
 alias cp='cp -i'
 alias mv='mv -i'
 
-alias vim='vim'
 alias vi='vim'
 alias v='vim'
 alias vr='vim -R'

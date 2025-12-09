@@ -4,8 +4,6 @@
 PATH="/usr/local/bin:${PATH}:/sbin:/usr/local/sbin"
 PATH="${HOME}/.local/bin:${PATH}"
 
-GOPATH="${HOME}/go"
-export GOPATH
 PATH="/usr/local/go/bin:${GOPATH}/bin:${PATH}"
 
 # rust path

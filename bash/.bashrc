@@ -48,20 +48,22 @@ shopt -s nocaseglob
 shopt -s progcomp
 shopt -u sourcepath
 
-# shellcheck disable=SC2155
+# GPG agent for SSH authentication
 export GPG_TTY="$(tty)"
-# shellcheck disable=SC2155
-export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-gpgconf --launch gpg-agent
-
-if [[ "$UID" -ne 0 ]]; then
-	PS1="\[\033[31m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\W\[\033[m\]\$ "
+if command -v gpgconf >/dev/null 2>&1; then
+	_ssh_sock="$(gpgconf --list-dirs agent-ssh-socket)"
+	if [[ -S "$_ssh_sock" ]]; then
+		export SSH_AUTH_SOCK="$_ssh_sock"
+	fi
+	unset _ssh_sock
+	gpg-connect-agent updatestartuptty /bye >/dev/null 2>&1
 fi
 
 if [ -f /etc/bash_completion ]; then
 	source /etc/bash_completion
-  test "$(command terraform -v > /dev/null 2>&1)"
-    complete -C /usr/bin/terraform terraform
+fi
+if command -v terraform >/dev/null 2>&1; then
+	complete -C /usr/bin/terraform terraform
 fi
 # source supplementary aliases definitions, functions and PATH
 for file in ~/.{bash_aliases,functions,path,env,bash_prompt}; do
