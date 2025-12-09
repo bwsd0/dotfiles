@@ -248,11 +248,20 @@ nnoremap <silent> <Space> :nohlsearch<CR>
 nnoremap <Leader>s
       \ :<C-U>set spell! spell?<CR>
 
-" window navigation
-nnoremap <C-H> <C-W>h
-nnoremap <C-J> <C-W>j
-nnoremap <C-K> <C-W>k
-nnoremap <C-L> <C-W>l
+" seamless vim/tmux pane navigation
+function! s:TmuxNavigate(dir)
+  let nr = winnr()
+  execute 'wincmd ' . a:dir
+  if nr == winnr()
+    let tmux_dir = tr(a:dir, 'hjkl', 'LDUR')
+    silent call system('tmux select-pane -' . tmux_dir)
+  endif
+endfunction
+
+nnoremap <silent> <C-H> :call <SID>TmuxNavigate('h')<CR>
+nnoremap <silent> <C-J> :call <SID>TmuxNavigate('j')<CR>
+nnoremap <silent> <C-K> :call <SID>TmuxNavigate('k')<CR>
+nnoremap <silent> <C-L> :call <SID>TmuxNavigate('l')<CR>
 
 " yank from cursor to end of line instead of before and after cursor
 " nnoremap Y y$
