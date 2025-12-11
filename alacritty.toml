@@ -11,23 +11,23 @@ decorations = "none"
   lines = 25
 
 [font]
-size = 15
+size = 10
 builtin_box_drawing = true
 
   [font.normal]
-  family = "inconsolata"
+  family = "Fira Code"
   style = "Regular"
 
   [font.bold]
-  family = "inconsolata"
+  family = "Fira Code"
   style = "Bold"
 
   [font.italic]
-  family = "inconsolata"
+  family = "Fira Code"
   style = "Italic"
 
   [font.bold_italic]
-  family = "inconsolata"
+  family = "Fira Code"
   style = "Bold Italic"
 
   [font.offset]
