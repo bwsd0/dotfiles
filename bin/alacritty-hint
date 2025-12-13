@@ -75,6 +75,12 @@ skip > 0 { skip--; next }
     cve)
         ${BROWSER:-xdg-open} "https://nvd.nist.gov/vuln/detail/$match"
         ;;
+    man)
+        # Parse manpage reference: command (section) or command(section)
+        cmd=$(echo "$match" | sed 's/ *(.*//');
+        section=$(echo "$match" | sed 's/.*(\([1-9][a-zA-Z]*\)).*/\1/')
+        run_in_pane "50%" "man $section '$cmd'"
+        ;;
     *)
         echo "unknown action: $action" >&2
         exit 1
