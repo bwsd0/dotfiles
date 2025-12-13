@@ -42,20 +42,20 @@ BASH_FILES := .bashrc .bash_profile .bash_logout .bash_aliases .path .functions 
 
 install-bash: ## install bash files
 	$(Q)for f in $(BASH_FILES); do \
-		echo "  INSTALL	bash/$$f"; \
+		cmp -s bash/$$f $(DESTDIR)/$$f || echo "  INSTALL	bash/$$f"; \
 		$(INSTALL) -m 644 bash/$$f $(DESTDIR)/$$f; \
 	done
 
 # SSH configuration
 install-ssh: ssh/config ## install SSH config
-	$(Q)$(call msg,INSTALL,$<)
 	$(Q)mkdir -p -m 0700 $(DESTDIR)/.ssh
+	$(Q)cmp -s $< $(DESTDIR)/.ssh/config || $(call msg,INSTALL,$<)
 	$(Q)$(INSTALL) -m 600 $< $(DESTDIR)/.ssh/config
 
 # Git configuration
 install-git: git/.gitconfig git/.gitignore_global ## install git config
 	$(Q)for f in $^; do \
-		echo "  INSTALL	$$f"; \
+		cmp -s $$f $(DESTDIR)/$$(basename $$f) || echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 644 $$f $(DESTDIR)/$$(basename $$f); \
 	done
 
@@ -65,7 +65,7 @@ BIN_FILES := $(wildcard bin/*)
 install-bin: $(BIN_FILES) ## install user scripts
 	$(Q)mkdir -p $(bindir)
 	$(Q)for f in $^; do \
-		echo "  INSTALL	$$f"; \
+		cmp -s $$f $(bindir)/$$(basename $$f) || echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 755 $$f $(bindir); \
 	done
 
@@ -74,9 +74,9 @@ VIM_FILES := $(shell find vim -type f -name '*.vim') vim/vimrc
 
 install-vim: $(VIM_FILES) ## install vim runtime
 	$(Q)for f in $(VIM_FILES); do \
-		echo "  INSTALL	$$f"; \
 		dest=".vim/$${f#vim/}"; \
 		mkdir -p $(DESTDIR)/$$(dirname $$dest); \
+		cmp -s $$f $(DESTDIR)/$$dest || echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 644 $$f $(DESTDIR)/$$dest; \
 	done
 
@@ -87,23 +87,23 @@ GPG_FILES := gnupg/gpg.conf gnupg/gpg-agent.conf
 install-gnupg: $(GPG_FILES) ## install gnupg config
 	$(Q)mkdir -p -m 0700 $(DESTDIR)/$(GNUPGHOME)
 	$(Q)for f in $^; do \
-		echo "  INSTALL	$$f"; \
+		cmp -s $$f $(DESTDIR)/$(GNUPGHOME)/$$(basename $$f) || echo "  INSTALL	$$f"; \
 		$(INSTALL) -m 600 $$f $(DESTDIR)/$(GNUPGHOME)/$$(basename $$f); \
 	done
 
 # Tmux configuration
 install-tmux: tmux/.tmux.conf ## install tmux.conf
-	$(Q)$(call msg,INSTALL,$<)
+	$(Q)cmp -s $< $(DESTDIR)/.tmux.conf || $(call msg,INSTALL,$<)
 	$(Q)$(INSTALL) -m 644 $< $(DESTDIR)/.tmux.conf
 
 # PostgreSQL configuration
 install-psqlrc: psql/.psqlrc ## install psqlrc
-	$(Q)$(call msg,INSTALL,$<)
+	$(Q)cmp -s $< $(DESTDIR)/.psqlrc || $(call msg,INSTALL,$<)
 	$(Q)$(INSTALL) -m 644 $< $(DESTDIR)/.psqlrc
 
 # MySQL configuration
 install-mycnf: mysql/.my.cnf ## install mysql config
-	$(Q)$(call msg,INSTALL,$<)
+	$(Q)cmp -s $< $(DESTDIR)/.my.cnf || $(call msg,INSTALL,$<)
 	$(Q)$(INSTALL) -m 644 $< $(DESTDIR)/.my.cnf
 
 # Cleanup
