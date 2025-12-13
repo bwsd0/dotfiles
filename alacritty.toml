@@ -1,4 +1,3 @@
-
 [colors]
   draw_bold_text_with_bright_colors = true
 
@@ -54,3 +53,49 @@ live_config_reload = true
 
 [terminal.shell]
 program = "/bin/bash"
+
+# Hints
+
+# URL - opens in browser.
+[[hints.enabled]]
+regex = "https?://[^\\s<>\"'`|\\[\\]{}()]+"
+hyperlinks = true
+command = { program = "/bin/sh", args = ["-c", "$HOME/.local/bin/alacritty-hint \"$@\"", "sh", "url"] }
+mouse.enabled = true
+mouse.mods = "Shift|Alt"
+
+# Image files - opens with feh or browser.
+[[hints.enabled]]
+regex = "[^\\s]+\\.(?i:png|tiff?|jpe?g)"
+command = { program = "/bin/sh", args = ["-c", "$HOME/.local/bin/alacritty-hint \"$@\"", "sh", "image"] }
+mouse.enabled = true
+mouse.mods = "Shift|Alt"
+
+# Edit file - opens in editor via tmux split.
+# Matches: /path/to/file, file.ext, file.ext:line, file.ext:line:col
+[[hints.enabled]]
+regex = "[^\\s:]+[./][^\\s:]*(?::\\d+(?::\\d+)?)?"
+command = { program = "/bin/sh", args = ["-c", "$HOME/.local/bin/alacritty-hint \"$@\"", "sh", "edit"] }
+mouse.enabled = true
+mouse.mods = "Shift|Alt"
+
+# CVE identifier - opens in NVD.
+[[hints.enabled]]
+regex = "CVE-\\d{4}-\\d{4,19}"
+command = { program = "/bin/sh", args = ["-c", "$HOME/.local/bin/alacritty-hint \"$@\"", "sh", "cve"] }
+mouse.enabled = true
+mouse.mods = "Shift|Alt"
+
+# RFC number - fetches and displays in tmux pane.
+[[hints.enabled]]
+regex = "(?i:rfc)\\s*\\d+"
+command = { program = "/bin/sh", args = ["-c", "$HOME/.local/bin/alacritty-hint \"$@\"", "sh", "rfc"] }
+mouse.enabled = true
+mouse.mods = "Shift|Alt"
+
+# Dictionary lookup - opens dict in tmux pane.
+[[hints.enabled]]
+regex = "(?-u:\\b)[a-zA-Z]{2,}(?-u:\\b)"
+command = { program = "/bin/sh", args = ["-c", "$HOME/.local/bin/alacritty-hint \"$@\"", "sh", "dict"] }
+mouse.enabled = true
+mouse.mods = "Shift|Alt"

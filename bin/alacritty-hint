@@ -1,0 +1,80 @@
+#!/bin/sh
+# Dispatcher for alacritty hints. Handles matches that require tmux or
+# complex logic.
+
+set -eu
+
+usage() {
+    echo "usage: alacritty-hint <action> <match>" >&2
+    exit 1
+}
+
+[ $# -ge 2 ] || usage
+
+action="$1"
+match="$2"
+
+# Run command in tmux split if inside tmux, otherwise in new alacritty window.
+# Split direction based on pane geometry: horizontal if wide, vertical otherwise.
+run_in_pane() {
+    size="$1"
+    cmd="$2"
+    w=$(tmux display -p '#{pane_width}')
+    h=$(tmux display -p '#{pane_height}')
+    cwd=$(tmux display -p '#{pane_current_path}')
+    if [ "$w" -gt $((h * 2)) ]; then
+        tmux split-window -h -l "$size" -c "$cwd" "$cmd"
+    else
+        tmux split-window -v -l "$size" -c "$cwd" "$cmd"
+    fi
+}
+
+case "$action" in
+    edit)
+        # Parse file:line:col format.
+        file="${match%%:*}"
+        rest="${match#"$file"}"
+        rest="${rest#:}"
+        line="${rest%%:*}"
+        rest="${rest#"$line"}"
+        rest="${rest#:}"
+        col="$rest"
+        line="${line:-1}"
+        col="${col:-1}"
+        run_in_pane "40%" "${EDITOR:-vim} '+call cursor($line,$col)' -- '$file'"
+        ;;
+    rfc)
+        # Extract RFC number (strip "rfc" prefix, case-insensitive).
+        num=$(echo "$match" | sed 's/^[Rr][Ff][Cc][[:space:]]*//')
+        cmd="curl -fsSL 'https://www.rfc-editor.org/rfc/rfc${num}.txt' | awk '
+BEGIN { blank = 0; skip = 0 }
+/\\f/ { skip = 2; next }
+/^RFC [0-9]+.*[A-Z][a-z]+ (19|20)[0-9][0-9]\$/ { next }
+/^\\[Page [0-9]+\\]\$/ { next }
+skip > 0 { skip--; next }
+/^[[:space:]]*\$/ { if (blank == 0) print \"\"; blank = 1; next }
+{ blank = 0; print }
+' | \${PAGER:-less}"
+        run_in_pane "50%" "$cmd"
+        ;;
+    dict)
+        run_in_pane "30%" "dict '$match' | \${PAGER:-less}"
+        ;;
+    image)
+        if command -v feh >/dev/null; then
+            feh -- "$match"
+        else
+            ${BROWSER:-xdg-open} "$match"
+        fi
+        ;;
+    url)
+        ${BROWSER:-xdg-open} "$match"
+        ;;
+    cve)
+        ${BROWSER:-xdg-open} "https://nvd.nist.gov/vuln/detail/$match"
+        ;;
+    *)
+        echo "unknown action: $action" >&2
+        exit 1
+        ;;
+esac
