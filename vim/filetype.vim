@@ -475,6 +475,11 @@ augroup filetypedetect
         \,tmux.conf
         \ setfiletype tmux
 
+  " TOML files
+  autocmd BufNewFile,BufRead
+        \ ?*.toml
+        \ setfiletype toml
+
   " Tab-separated (TSV) files
   autocmd BufNewFile,BufRead
         \ ?*.tsv
