@@ -24,6 +24,8 @@ run_in_pane() {
     cwd=$(tmux display -p '#{pane_current_path}')
     if [ "$w" -gt $((h * 2)) ]; then
         tmux split-window -h -l "$size" -c "$cwd" "$cmd"
+        new_w=$(tmux display -p '#{pane_width}')
+        [ "$new_w" -lt 80 ] && tmux resize-pane -x 80
     else
         tmux split-window -v -l "$size" -c "$cwd" "$cmd"
     fi
