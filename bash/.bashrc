@@ -8,7 +8,7 @@ case $- in
 esac
 
 # disable write(1), talk(1) to terminal
-mesg n
+command -v mesg &>/dev/null && mesg n 2>/dev/null
 
 # unset -f command_not_found_handle
 
