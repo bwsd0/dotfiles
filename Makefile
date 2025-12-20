@@ -19,7 +19,8 @@ TARGETS := install-bin \
 	install-tmux \
 	install-psqlrc \
 	install-mycnf \
-	install-vim
+	install-vim \
+	install-i3
 
 .PHONY: all default install clean help configure $(TARGETS)
 
@@ -105,6 +106,12 @@ install-psqlrc: psql/.psqlrc ## install psqlrc
 install-mycnf: mysql/.my.cnf ## install mysql config
 	$(Q)cmp -s $< $(DESTDIR)/.my.cnf || $(call msg,INSTALL,$<)
 	$(Q)$(INSTALL) -m 644 $< $(DESTDIR)/.my.cnf
+
+# i3 window manager configuration
+install-i3: i3/config ## install i3 config
+	$(Q)mkdir -p $(DESTDIR)/.config/i3
+	$(Q)cmp -s $< $(DESTDIR)/.config/i3/config || $(call msg,INSTALL,$<)
+	$(Q)$(INSTALL) -m 644 $< $(DESTDIR)/.config/i3/config
 
 # Cleanup
 clean: ## clean generated files
