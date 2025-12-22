@@ -20,6 +20,28 @@ elseif &runtimepath !=# ''
   let $VIMDIR = split(&runtimepath, ',')[0]
 endif
 
+" Bootstrap native packages: clone missing plugins on startup
+let s:plugins = [
+      \ ['pack/lsp/start/async.vim', 'https://github.com/prabirshrestha/async.vim.git'],
+      \ ['pack/lsp/start/vim-lsp', 'https://github.com/prabirshrestha/vim-lsp.git'],
+      \ ['pack/plugins/start/vim-go', 'https://github.com/fatih/vim-go.git'],
+      \ ['pack/plugins/start/vim-terraform', 'https://github.com/hashivim/vim-terraform.git'],
+      \ ['pack/plugins/start/rust.vim', 'https://github.com/rust-lang/rust.vim'],
+      \ ]
+
+for [s:path, s:url] in s:plugins
+  let s:fullpath = $VIMDIR . '/' . s:path
+  if !isdirectory(s:fullpath)
+    echom 'Installing ' . s:path . '...'
+    call mkdir(fnamemodify(s:fullpath, ':h'), 'p')
+    call system('git clone --depth 1 ' . shellescape(s:url) . ' ' . shellescape(s:fullpath))
+    if v:shell_error
+      echoerr 'Failed to clone ' . s:url
+    endif
+  endif
+endfor
+unlet! s:path s:url s:fullpath
+
 set t_Co=256
 set background=dark
 syntax on
@@ -330,20 +352,6 @@ if executable('pylsp')
         \ 'name': 'pylsp',
         \ 'cmd': {server_info->['pylsp']},
         \ 'allowlist': ['python'],
-        \ })
-elseif executable('pyright-langserver')
-  au User lsp_setup call lsp#register_server({
-        \ 'name': 'pyright',
-        \ 'cmd': {server_info->['pyright-langserver', '--stdio']},
-        \ 'allowlist': ['python'],
-        \ 'workspace_config': {
-        \   'python': {
-        \     'analysis': {
-        \       'autoSearchPaths': v:true,
-        \       'useLibraryCodeForTypes': v:true,
-        \     },
-        \   },
-        \ },
         \ })
 endif
 
